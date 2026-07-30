@@ -4,15 +4,15 @@
 
 <h1 align="center">Everend Compendium</h1>
 <p align="center">
-  The static, publishable reading site for <a href="https://github.com/Everendforge/everend-forge">Everend Forge</a> canon.<br />
+  The static, publishable reading site for <a href="https://github.com/SoleipDreams/everend-forge">Everend Forge</a> canon.<br />
   Turns a WorldNotion vault and PathBranching's saved stories into a public compendium.
 </p>
 
 <p align="center">
-  <a href="https://github.com/Everendforge/ef-compendium/actions/workflows/ci.yml"><img src="https://github.com/Everendforge/ef-compendium/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://github.com/SoleipDreams/everend-forge-compendium/actions/workflows/ci.yml"><img src="https://github.com/SoleipDreams/everend-forge-compendium/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <img src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/built%20with-Vite%20%2B%20Tauri%20%2B%20TypeScript-1e2a4a.svg" alt="Built with Vite, Tauri, TypeScript">
-  <a href="https://github.com/Everendforge/everend-forge"><img src="https://img.shields.io/badge/Everend%20Forge-open%20core%20suite-0a0e1a.svg" alt="Part of Everend Forge"></a>
+  <a href="https://github.com/SoleipDreams/everend-forge"><img src="https://img.shields.io/badge/Everend%20Forge-open%20core%20suite-0a0e1a.svg" alt="Part of Everend Forge"></a>
 </p>
 
 ---

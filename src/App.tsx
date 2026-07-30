@@ -72,10 +72,10 @@ import {
 } from "./vaultAppearanceSettings";
 
 const EVEREND_FORGE_GITHUB_URL =
-  "https://github.com/Everendforge/everend-forge";
+  "https://github.com/SoleipDreams/everend-forge";
 const BUY_SUITE_URL = "https://everendforge.com/buy-suite";
 const COMPENDIUM_DOCS_URL =
-  "https://github.com/Everendforge/everend-compendium";
+  "https://github.com/SoleipDreams/everend-compendium";
 
 function ForgeCornerLogo() {
   return (
