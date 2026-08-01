@@ -55,3 +55,7 @@ npm test
 ```
 
 The synthetic fixture under `tests/fixtures/vault` is also the GitHub Pages demo source.
+
+## Support
+
+If Everend Forge is useful to you, you can support its development on [Ko-fi](https://ko-fi.com/heinzdbv).
