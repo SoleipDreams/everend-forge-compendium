@@ -1,6 +1,6 @@
 {
   "name": "@everendforge/compendium",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": false,
   "type": "module",
   "description": "Static, publishable universe compendium and desktop reader for Everend Forge.",
