@@ -1,13 +1,15 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getSiteData } from "../../../src/lib/node/site-data";
+import { siteAssetPath, sitePath } from "../../../src/lib/site-links";
 const data = getSiteData();
+const baseUrl = data.config.site?.baseUrl;
 export function getStaticPaths() { return getSiteData().entities.map((entity) => ({ params: { type: entity.route.split("/")[1], id: entity.route.split("/")[2] }, props: { entity } })); }
 const { entity } = Astro.props;
 const related = entity.backlinks.map((id) => data.entities.find((candidate) => candidate.id === id)).filter(Boolean);
 const appearances = data.stories.flatMap((story) => story.sequences.flatMap((sequence) => sequence.events.filter((event) => event.canonRefs.includes(entity.id)).map((event) => ({ event, story }))));
 ---
 <BaseLayout title={`${entity.name} · ${data.title}`}>
-  <article class="entry">{entity.presentation?.cover && <img class="entry-cover-image" src={`/assets/${entity.presentation.cover}`} alt="" />}<div class="entry-heading"><p class="chapter">{entity.type}</p><div class="entry-title-row">{entity.presentation?.portrait && <img class="entry-portrait-image" src={`/assets/${entity.presentation.portrait}`} alt={`${entity.name} portrait`} />}<h1>{entity.name}</h1></div>{entity.tags.length > 0 && <p class="tags">{entity.tags.join(" · ")}</p>}</div><div class="entry-body" set:html={entity.html} /></article>
-  <aside class="related"><section><h2>Related entries</h2>{related.length ? <ul>{related.map((item) => <li><a href={item.route}>{item.name}</a><span>{item.type}</span></li>)}</ul> : <p>No published backlinks yet.</p>}</section><section><h2>Appears in stories</h2>{appearances.length ? <ul>{appearances.map(({ event, story }) => <li><a href={event.route}>{event.name}</a><span>{story.name}</span></li>)}</ul> : <p>No published scenes reference this entry.</p>}</section></aside>
+  <article class="entry">{entity.presentation?.cover && <img class="entry-cover-image" src={siteAssetPath(entity.presentation.cover, baseUrl)} alt="" />}<div class="entry-heading"><p class="chapter">{entity.type}</p><div class="entry-title-row">{entity.presentation?.portrait && <img class="entry-portrait-image" src={siteAssetPath(entity.presentation.portrait, baseUrl)} alt={`${entity.name} portrait`} />}<h1>{entity.name}</h1></div>{entity.tags.length > 0 && <p class="tags">{entity.tags.join(" · ")}</p>}</div><div class="entry-body" set:html={entity.html} /></article>
+  <aside class="related"><section><h2>Related entries</h2>{related.length ? <ul>{related.map((item) => <li><a href={sitePath(item.route, baseUrl)}>{item.name}</a><span>{item.type}</span></li>)}</ul> : <p>No published backlinks yet.</p>}</section><section><h2>Appears in stories</h2>{appearances.length ? <ul>{appearances.map(({ event, story }) => <li><a href={sitePath(event.route, baseUrl)}>{event.name}</a><span>{story.name}</span></li>)}</ul> : <p>No published scenes reference this entry.</p>}</section></aside>
 </BaseLayout>

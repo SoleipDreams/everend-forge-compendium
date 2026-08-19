@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getSiteData } from "../../../src/lib/node/site-data";
+import { sitePath } from "../../../src/lib/site-links";
 const data = getSiteData();
+const baseUrl = data.config.site?.baseUrl;
 ---
-<BaseLayout title={`Stories · ${data.title}`}><section class="page-title"><p class="chapter">Narrative archive</p><h1>Stories</h1><p>Editorial scenes and their canon relationships, without interactive-game logic.</p></section><section class="story-list">{data.stories.map((story) => <article><h2><a href={story.route}>{story.name}</a></h2><p>{story.sequences.reduce((total, sequence) => total + sequence.events.length, 0)} published scenes</p></article>)}</section></BaseLayout>
+<BaseLayout title={`Stories · ${data.title}`}><section class="page-title"><p class="chapter">Narrative archive</p><h1>Stories</h1><p>Editorial scenes and their canon relationships, without interactive-game logic.</p></section><section class="story-list">{data.stories.map((story) => <article><h2><a href={sitePath(story.route, baseUrl)}>{story.name}</a></h2><p>{story.sequences.reduce((total, sequence) => total + sequence.events.length, 0)} published scenes</p></article>)}</section></BaseLayout>

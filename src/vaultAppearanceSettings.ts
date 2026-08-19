@@ -2,8 +2,11 @@ import { normalizeThemeId, type ThemeId } from "./themes.js";
 import { normalizePrimaryFont, type PrimaryFontId } from "./typography.js";
 import type { CompendiumSettings } from "./settings.js";
 
-/** Namespaced under `.compendium` so it can't collide with WorldNotion's own `.everend/settings.json`. */
-export const VAULT_APPEARANCE_SETTINGS_PATH = ".everend/.compendium/settings.json";
+/** Stored separately so appearance saves never overwrite the publication config. */
+export const VAULT_APPEARANCE_SETTINGS_PATH =
+  ".everend/.compendium/appearance.json";
+const LEGACY_VAULT_APPEARANCE_SETTINGS_PATH =
+  ".everend/.compendium/settings.json";
 
 /**
  * The slice of {@link CompendiumSettings} that represents how this universe's
@@ -20,14 +23,22 @@ export type CompendiumVaultAppearanceSettings = {
 export function extractVaultAppearanceSettings(
   settings: CompendiumSettings,
 ): CompendiumVaultAppearanceSettings {
-  return { version: 1, theme: settings.theme, primaryFont: settings.primaryFont };
+  return {
+    version: 1,
+    theme: settings.theme,
+    primaryFont: settings.primaryFont,
+  };
 }
 
-export function serializeVaultAppearance(appearance: CompendiumVaultAppearanceSettings): string {
+export function serializeVaultAppearance(
+  appearance: CompendiumVaultAppearanceSettings,
+): string {
   return `${JSON.stringify(appearance, null, 2)}\n`;
 }
 
-export function serializeVaultAppearanceSettings(settings: CompendiumSettings): string {
+export function serializeVaultAppearanceSettings(
+  settings: CompendiumSettings,
+): string {
   return serializeVaultAppearance(extractVaultAppearanceSettings(settings));
 }
 
@@ -37,20 +48,37 @@ export function applyVaultAppearanceSettings(
   appearance: CompendiumVaultAppearanceSettings | undefined,
 ): CompendiumSettings {
   if (!appearance) return base;
-  return { ...base, theme: appearance.theme, primaryFont: appearance.primaryFont };
+  return {
+    ...base,
+    theme: appearance.theme,
+    primaryFont: appearance.primaryFont,
+  };
 }
 
 export function parseVaultAppearanceSettings(
   files: Array<{ relativePath: string; content: string }>,
 ): CompendiumVaultAppearanceSettings | undefined {
-  const file = files.find(
-    (candidate) => candidate.relativePath.replaceAll("\\", "/") === VAULT_APPEARANCE_SETTINGS_PATH,
-  );
+  const file =
+    files.find(
+      (candidate) =>
+        candidate.relativePath.replaceAll("\\", "/") ===
+        VAULT_APPEARANCE_SETTINGS_PATH,
+    ) ??
+    files.find(
+      (candidate) =>
+        candidate.relativePath.replaceAll("\\", "/") ===
+        LEGACY_VAULT_APPEARANCE_SETTINGS_PATH,
+    );
   if (!file) return undefined;
 
   try {
-    const parsed = JSON.parse(file.content) as Partial<CompendiumVaultAppearanceSettings> | null;
+    const parsed = JSON.parse(
+      file.content,
+    ) as Partial<CompendiumVaultAppearanceSettings> | null;
     if (!parsed || typeof parsed !== "object") return undefined;
+    if ("specVersion" in parsed) return undefined;
+    if (parsed.version !== 1 || typeof parsed.theme !== "string")
+      return undefined;
     return {
       version: 1,
       theme: normalizeThemeId(parsed.theme),

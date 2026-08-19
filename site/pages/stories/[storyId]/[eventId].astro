@@ -1,9 +1,11 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getSiteData } from "../../../../src/lib/node/site-data";
+import { siteAssetPath, sitePath } from "../../../../src/lib/site-links";
 const data = getSiteData();
+const baseUrl = data.config.site?.baseUrl;
 export function getStaticPaths() { return getSiteData().stories.flatMap((story) => story.sequences.flatMap((sequence) => sequence.events.map((event) => ({ params: { storyId: story.route.split("/")[2], eventId: event.route.split("/")[3] }, props: { story, event } })))); }
 const { story, event } = Astro.props;
 const refs = event.canonRefs.map((id) => data.entities.find((entity) => entity.id === id)).filter(Boolean);
 ---
-<BaseLayout title={`${event.name} · ${data.title}`}><article class="entry">{event.coverImage && <img class="event-cover-image" src={`/assets/${event.coverImage}`} alt="" />}{event.images && event.images.length > 1 && <div class="event-image-gallery" aria-label="Scene images">{event.images.slice(1).map((path) => <img class="event-scene-image" src={`/assets/${path}`} alt="" />)}</div>}<div class="entry-heading"><p class="chapter">{story.name}</p><h1>{event.name}</h1>{event.description && <p>{event.description}</p>}</div>{event.html && <div class="entry-body" set:html={event.html} />}</article><aside class="related"><h2>Canon references</h2><ul>{refs.map((entity) => <li><a href={entity.route}>{entity.name}</a><span>{entity.type}</span></li>)}</ul></aside></BaseLayout>
+<BaseLayout title={`${event.name} · ${data.title}`}><article class="entry">{event.coverImage && <img class="event-cover-image" src={siteAssetPath(event.coverImage, baseUrl)} alt="" />}{event.images && event.images.length > 1 && <div class="event-image-gallery" aria-label="Scene images">{event.images.slice(1).map((path) => <img class="event-scene-image" src={siteAssetPath(path, baseUrl)} alt="" />)}</div>}<div class="entry-heading"><p class="chapter">{story.name}</p><h1>{event.name}</h1>{event.description && <p>{event.description}</p>}</div>{event.html && <div class="entry-body" set:html={event.html} />}</article><aside class="related"><h2>Canon references</h2><ul>{refs.map((entity) => <li><a href={sitePath(entity.route, baseUrl)}>{entity.name}</a><span>{entity.type}</span></li>)}</ul></aside></BaseLayout>

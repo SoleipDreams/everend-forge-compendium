@@ -1,8 +1,10 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getSiteData } from "../../../../src/lib/node/site-data";
+import { sitePath } from "../../../../src/lib/site-links";
 const data = getSiteData();
+const baseUrl = data.config.site?.baseUrl;
 export function getStaticPaths() { return getSiteData().stories.map((story) => ({ params: { storyId: story.route.split("/")[2] }, props: { story } })); }
 const { story } = Astro.props;
 ---
-<BaseLayout title={`${story.name} · ${data.title}`}><section class="page-title"><p class="chapter">Story</p><h1>{story.name}</h1></section>{story.sequences.map((sequence) => <section class="sequence"><h2>{sequence.name}</h2><ol>{sequence.events.map((event) => <li><a href={event.route}>{event.name}</a>{event.description && <p>{event.description}</p>}</li>)}</ol></section>)}</BaseLayout>
+<BaseLayout title={`${story.name} · ${data.title}`}><section class="page-title"><p class="chapter">Story</p><h1>{story.name}</h1></section>{story.sequences.map((sequence) => <section class="sequence"><h2>{sequence.name}</h2><ol>{sequence.events.map((event) => <li><a href={sitePath(event.route, baseUrl)}>{event.name}</a>{event.description && <p>{event.description}</p>}</li>)}</ol></section>)}</BaseLayout>

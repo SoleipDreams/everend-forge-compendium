@@ -10,8 +10,60 @@ export type CompendiumConfig = {
   };
   theme?: { preset?: "midnight" | "parchment" | "ink"; accentColor?: string };
   navigation?: { typeOrder?: string[] };
-  publication?: { statuses?: string[] };
+  publication?: { statuses?: string[]; activeProfileId?: string };
   narrative?: { mode?: "scenes-and-relations" };
+};
+
+export type PublicationMode = "all" | "preview";
+
+export type PublicationIdSelection = {
+  include: string[];
+  exclude: string[];
+};
+
+export type PublicationProfile = {
+  profileVersion: 1;
+  id: string;
+  name: string;
+  rules: { statuses: string[] };
+  selection: {
+    entityIds: PublicationIdSelection;
+    storyIds: PublicationIdSelection;
+    sequenceIds: PublicationIdSelection;
+    eventIds: PublicationIdSelection;
+  };
+  dependencyPolicy: "include-marked";
+};
+
+export type PublicationReason = "status" | "manual" | "dependency";
+
+export type PublicationFinding = {
+  severity: "warning" | "error";
+  message: string;
+  id?: string;
+};
+
+export type PublicationManifest = {
+  profileId: string;
+  profileName: string;
+  mode: "preview";
+  included: {
+    entityIds: string[];
+    dependencyEntityIds: string[];
+    storyIds: string[];
+    sequenceIds: string[];
+    eventIds: string[];
+  };
+  excluded: {
+    entityIds: string[];
+    storyIds: string[];
+    sequenceIds: string[];
+    eventIds: string[];
+  };
+  reasons: Record<string, PublicationReason>;
+  assets: string[];
+  warnings: PublicationFinding[];
+  sourceFingerprint: string;
 };
 
 export type UniverseIcon = {
@@ -98,6 +150,22 @@ export type SiteData = {
   /** Status values found in entity frontmatter, including unpublished entries. */
   availableStatuses: string[];
   /** Vault-relative binary asset paths indexed during load. */
+  assetPaths: string[];
+  stories: Story[];
+  warnings: string[];
+  mode?: PublicationMode;
+  publication?: PublicationProfile;
+  publicationManifest?: PublicationManifest;
+};
+
+export type IndexedUniverse = {
+  vaultPath: string;
+  config: CompendiumConfig;
+  universeProfile?: UniverseProfile;
+  title: string;
+  description: string;
+  entities: Entity[];
+  availableStatuses: string[];
   assetPaths: string[];
   stories: Story[];
   warnings: string[];

@@ -135,7 +135,10 @@ fn is_image_file(path: &Path) -> bool {
 }
 
 fn allowed_dot_dir(name: &str) -> bool {
-    name == ".everend" || name == ".pathbranching"
+    name == ".everend"
+        || name == ".pathbranching"
+        || name == ".compendium"
+        || name == ".worldnotion"
 }
 
 fn walk_vault(
@@ -352,6 +355,24 @@ fn save_universe_text_file(
     })
 }
 
+#[tauri::command]
+fn delete_universe_file(
+    universe_path: String,
+    relative_path: String,
+) -> Result<WriteResult, String> {
+    let (_root, path) = resolve_vault_path(&universe_path, &relative_path)?;
+    if path.exists() {
+        if !path.is_file() {
+            return Err("Path is not a file.".to_string());
+        }
+        fs::remove_file(path).map_err(|error| error.to_string())?;
+    }
+    Ok(WriteResult {
+        ok: true,
+        message: None,
+    })
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -371,7 +392,8 @@ pub fn run() {
             path_exists,
             read_file_base64,
             reveal_vault,
-            save_universe_text_file
+            save_universe_text_file,
+            delete_universe_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

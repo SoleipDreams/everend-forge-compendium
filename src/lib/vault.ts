@@ -84,16 +84,8 @@ export function discoverEntityStatuses(files: SourceFile[]) {
   return [...statuses].sort((left, right) => left.localeCompare(right));
 }
 
-export function projectEntities(
-  files: SourceFile[],
-  publishedStatuses: string[],
-  warnings: string[],
-  sanitize: Sanitizer,
-): Entity[] {
+function readEntities(files: SourceFile[], warnings: string[]): Entity[] {
   const entities: Entity[] = [];
-  const assetPaths = files
-    .filter((file) => file.binary)
-    .map((file) => file.relativePath.replaceAll("\\", "/"));
   const propertiesContent = files.find(
     (file) =>
       file.relativePath.replaceAll("\\", "/") === ".everend/properties.json",
@@ -118,9 +110,8 @@ export function projectEntities(
       warnings.push(`${relativePath} is missing required entity frontmatter.`);
       continue;
     }
-    if (!publishedStatuses.includes(status)) continue;
     if (seenIds.has(id)) {
-      warnings.push(`${relativePath} has duplicate published id ${id}.`);
+      warnings.push(`${relativePath} has duplicate entity id ${id}.`);
       continue;
     }
     seenIds.add(id);
@@ -155,11 +146,36 @@ export function projectEntities(
         propertiesContent,
         type,
         parsed.frontmatter,
-        assetPaths,
+        files
+          .filter((candidate) => candidate.binary)
+          .map((candidate) => candidate.relativePath.replaceAll("\\", "/")),
         relativePath,
       ),
     });
   }
+
+  return entities.sort((left, right) => left.name.localeCompare(right.name));
+}
+
+export function resolveEntityReference(
+  entities: Entity[],
+  target: string,
+): Entity | undefined {
+  const normalized = target.trim().toLowerCase();
+  return entities.find((entity) => lookupKeys(entity).includes(normalized));
+}
+
+function decorateEntities(
+  sourceEntities: Entity[],
+  assetPaths: string[],
+  sanitize: Sanitizer,
+): Entity[] {
+  const entities: Entity[] = sourceEntities.map((entity) => ({
+    ...entity,
+    linkedIds: [],
+    backlinks: [],
+    html: "",
+  }));
 
   const byKey = new Map<string, Entity>();
   entities.forEach((entity) =>
@@ -188,6 +204,32 @@ export function projectEntities(
     );
   });
   return entities.sort((left, right) => left.name.localeCompare(right.name));
+}
+
+/** Indexes every valid entity regardless of its publication status. */
+export function indexEntities(
+  files: SourceFile[],
+  warnings: string[],
+  sanitize: Sanitizer,
+): Entity[] {
+  const assetPaths = files
+    .filter((file) => file.binary)
+    .map((file) => file.relativePath.replaceAll("\\", "/"));
+  return decorateEntities(readEntities(files, warnings), assetPaths, sanitize);
+}
+
+/** Projects an indexed entity set into the visible publication subset. */
+export function projectEntities(
+  indexedEntities: Entity[],
+  includedIds: Set<string>,
+  assetPaths: string[],
+  sanitize: Sanitizer,
+): Entity[] {
+  return decorateEntities(
+    indexedEntities.filter((entity) => includedIds.has(entity.id)),
+    assetPaths,
+    sanitize,
+  );
 }
 
 /** Resolver over projected entities, matching id, name, file base, or alias. */

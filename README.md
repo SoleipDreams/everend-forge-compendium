@@ -29,11 +29,24 @@ Compendium is the reading, consultation, and publication surface of Everend Forg
 npm install
 npm run init -- /path/to/universe
 npx tsx cli/cli.ts build /path/to/universe --out=dist
+npx tsx cli/cli.ts package /path/to/universe --profile=public-demo --out=compendium-export.zip
 npm run site:dev -- /path/to/universe
 npx tsx cli/cli.ts markdown /path/to/universe --out=wiki-export
 ```
 
-The optional `.everend/compendium.yaml` sets the site title, visual theme, navigation order, and publishable statuses. `canon` is the default. The reader projects only PathBranching story, sequence, event, text, description, and canon references; it deliberately omits choices, conditions, variables, consequences, and graph state.
+The preferred configuration is `.everend/.compendium/settings.json`. Existing vaults may keep using `.everend/compendium.yaml`; it is read as a legacy fallback and is never migrated or deleted automatically. The settings file controls the site title, visual theme, navigation order, and default statuses. Publication profiles live at `.everend/.compendium/publications/<profile-id>.json` and combine status rules with direct includes/excludes. `Preview` is the exportable projection; `All` is available only for local inspection. The reader projects only PathBranching story, sequence, event, text, description, and canon references; it deliberately omits choices, conditions, variables, consequences, and graph state.
+
+Useful publication commands:
+
+```sh
+npx tsx cli/cli.ts dev /path/to/universe --mode=all
+npx tsx cli/cli.ts preview /path/to/universe --profile=public-demo
+npx tsx cli/cli.ts dev /path/to/universe --mode=preview --profile=public-demo
+npx tsx cli/cli.ts build /path/to/universe --profile=public-demo --out=dist
+npx tsx cli/cli.ts package /path/to/universe --profile=public-demo --out=compendium-export.zip
+```
+
+`build` and `package` always use `Preview`; they reject `--mode=all`. Every Preview build writes `publication-manifest.json` beside the generated pages. The package is a standalone static site and contains only assets referenced by that publication.
 
 `dist/` is ordinary static HTML and can be hosted on GitHub Pages, Cloudflare Pages, Netlify, or any static host. `export:markdown` produces a portable Markdown bundle and manifest for other wiki tools.
 

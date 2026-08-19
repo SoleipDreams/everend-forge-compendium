@@ -1,16 +1,19 @@
 ---
 import "../styles/global.css";
 import { getSiteData } from "../../src/lib/node/site-data";
+import { siteAssetPath, sitePath } from "../../src/lib/site-links";
 
 const data = getSiteData();
+const baseUrl = data.config.site?.baseUrl;
+const brandImage = data.config.site?.logo ? siteAssetPath(data.config.site.logo, baseUrl) : sitePath("/favicon.png", baseUrl);
 const { title = data.title, description = data.description } = Astro.props;
 const orderedTypes = [...new Set(data.entities.map((entity) => entity.type))].sort((a, b) => {
   const order = data.config.navigation?.typeOrder ?? [];
   return (order.indexOf(a) + 1 || 999) - (order.indexOf(b) + 1 || 999) || a.localeCompare(b);
 });
 const searchEntries = [
-  ...data.entities.map((entity) => ({ name: entity.name, type: entity.type, route: entity.route })),
-  ...data.stories.flatMap((story) => story.sequences.flatMap((sequence) => sequence.events.map((event) => ({ name: event.name, type: story.name, route: event.route })))),
+  ...data.entities.map((entity) => ({ name: entity.name, type: entity.type, route: sitePath(entity.route, baseUrl) })),
+  ...data.stories.flatMap((story) => story.sequences.flatMap((sequence) => sequence.events.map((event) => ({ name: event.name, type: story.name, route: sitePath(event.route, baseUrl) })))),
 ];
 ---
 
@@ -20,19 +23,19 @@ const searchEntries = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href={sitePath("/favicon.png", baseUrl)} />
     <title>{title}</title>
   </head>
   <body style={`--accent:${data.config.theme?.accentColor ?? "#C89B3C"}`}>
     <header class="topbar">
-      <a class="brand" href="/"><img class="brand-icon" src="/favicon.png" alt="" width="28" height="28" />{data.title}</a>
-      <nav aria-label="Primary navigation"><a href="/">Universe</a><a href="/stories/">Stories</a></nav>
+      <a class="brand" href={sitePath("/", baseUrl)}><img class="brand-icon" src={brandImage} alt="" width="28" height="28" />{data.title}</a>
+      <nav aria-label="Primary navigation"><a href={sitePath("/", baseUrl)}>Universe</a><a href={sitePath("/stories/", baseUrl)}>Stories</a></nav>
       <div class="search"><label for="compendium-search" class="visually-hidden">Search the Compendium</label><input id="compendium-search" type="search" placeholder="Search the Compendium…" autocomplete="off" /><ul id="search-results" hidden></ul></div>
     </header>
     <div class="shell">
       <aside class="toc" aria-label="Table of contents">
         <p class="toc-title">Table of Contents</p>
-        {orderedTypes.map((type) => <section><h2>{type}</h2><ul>{data.entities.filter((entity) => entity.type === type).map((entity) => <li><a href={entity.route}>{entity.name}</a></li>)}</ul></section>)}
+        {orderedTypes.map((type) => <section><h2>{type}</h2><ul>{data.entities.filter((entity) => entity.type === type).map((entity) => <li><a href={sitePath(entity.route, baseUrl)}>{entity.name}</a></li>)}</ul></section>)}
       </aside>
       <main><slot /></main>
     </div>

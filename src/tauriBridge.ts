@@ -41,6 +41,13 @@ export function saveUniverseTextFile(
   });
 }
 
+export function deleteUniverseFile(universePath: string, relativePath: string) {
+  return invoke<{ ok: boolean; message?: string }>("delete_universe_file", {
+    universePath,
+    relativePath,
+  });
+}
+
 export function openExternal(url: string) {
   if (isTauriRuntime()) return openUrl(url);
   window.open(url, "_blank", "noopener,noreferrer");

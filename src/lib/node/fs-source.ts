@@ -15,7 +15,12 @@ const IMAGE_EXTENSIONS = new Set([
 ]);
 
 /** Dot-directories the walk is allowed to descend into. */
-const ALLOWED_DOT_DIRS = new Set([".everend", ".pathbranching"]);
+const ALLOWED_DOT_DIRS = new Set([
+  ".everend",
+  ".pathbranching",
+  ".compendium",
+  ".worldnotion",
+]);
 
 function walk(root: string, current: string, files: SourceFile[]) {
   for (const entry of fs.readdirSync(current, { withFileTypes: true })) {

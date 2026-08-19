@@ -20,6 +20,7 @@ import compendiumIcon from "./assets/everend-compendium-icon.png";
 import forgeLogoOnDark from "./assets/everend-forge-logo-on-dark.png";
 import forgeLogoOnLight from "./assets/everend-forge-logo-on-light.png";
 import { Reader, type ReaderMode } from "./components/Reader";
+import { PublicationManager } from "./components/PublicationManager";
 import { mapDefinitions } from "./components/MapsView";
 import { SearchBox } from "./components/SearchBox";
 import { timelineEntries } from "./components/TimelineView";
@@ -31,7 +32,14 @@ import {
   SettingsDialog,
   type SettingsSection,
 } from "./components/SettingsDialog";
-import { assembleSiteData } from "./lib/assemble";
+import { assembleIndexedUniverse } from "./lib/assemble";
+import {
+  loadPublicationProfiles,
+  profileForId,
+  projectIndexedUniverse,
+  publicationRelativePath,
+  serializePublicationProfile,
+} from "./lib/publications";
 import { serializeConfig } from "./lib/config";
 import { sanitizeDom } from "./lib/sanitize-dom";
 import {
@@ -47,6 +55,7 @@ import {
   openExternal,
   openVaultDialog,
   revealVault,
+  deleteUniverseFile,
   saveUniverseTextFile,
 } from "./tauriBridge";
 import {
@@ -61,7 +70,14 @@ import {
   primaryFontCssValue,
   type PrimaryFontId,
 } from "./typography";
-import type { Entity, SiteData, UniverseProfile } from "./types";
+import type {
+  Entity,
+  IndexedUniverse,
+  PublicationMode,
+  PublicationProfile,
+  SiteData,
+  UniverseProfile,
+} from "./types";
 import type { SuiteChrome } from "./suiteChrome";
 import {
   VAULT_APPEARANCE_SETTINGS_PATH,
@@ -237,89 +253,6 @@ function TypographySettings({
   );
 }
 
-function statusLabel(status: string) {
-  return status
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function PublicationSettings({
-  site,
-  onSave,
-}: {
-  site: SiteData;
-  onSave: (statuses: string[]) => Promise<void>;
-}) {
-  const configuredStatuses = site.config.publication?.statuses ?? ["canon"];
-  const [selectedStatuses, setSelectedStatuses] =
-    useState<string[]>(configuredStatuses);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setSelectedStatuses(site.config.publication?.statuses ?? ["canon"]);
-  }, [site]);
-
-  const statuses = [
-    ...new Set(["canon", ...site.availableStatuses, ...selectedStatuses]),
-  ];
-
-  return (
-    <section className="publication-settings">
-      <div className="settings-section-heading">
-        <div>
-          <h4>Published content</h4>
-          <p>
-            Choose which frontmatter statuses are visible in this Compendium.
-          </p>
-        </div>
-        <span>{site.entities.length} visible</span>
-      </div>
-      <div className="publication-status-list">
-        {statuses.map((status) => (
-          <label className="publication-status-option" key={status}>
-            <input
-              type="checkbox"
-              checked={selectedStatuses.includes(status)}
-              onChange={(event) => {
-                setSelectedStatuses((current) =>
-                  event.target.checked
-                    ? [...current, status]
-                    : current.filter((value) => value !== status),
-                );
-              }}
-            />
-            <span>
-              <strong>{statusLabel(status)}</strong>
-              {status === "canon" ? (
-                <small>All entries marked as canon are included.</small>
-              ) : null}
-            </span>
-          </label>
-        ))}
-      </div>
-      <p className="publication-settings-note">
-        Canon is selected by default. Unchecking it hides every canonical entry.
-      </p>
-      <button
-        type="button"
-        className="primary-action publication-save-button"
-        disabled={saving || selectedStatuses.length === 0}
-        onClick={async () => {
-          setSaving(true);
-          try {
-            await onSave(selectedStatuses);
-          } finally {
-            setSaving(false);
-          }
-        }}
-      >
-        {saving ? "Saving…" : "Save publication settings"}
-      </button>
-    </section>
-  );
-}
 const STARTUP_LOADER_MIN_MS = 700;
 
 function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
@@ -327,10 +260,19 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
     loadSettings(),
   );
   useEffect(() => {
-    applyInterfaceLocale(suiteChrome?.suiteSettings?.localePreference ?? settings.localePreference);
+    applyInterfaceLocale(
+      suiteChrome?.suiteSettings?.localePreference ?? settings.localePreference,
+    );
   }, [settings.localePreference, suiteChrome?.suiteSettings?.localePreference]);
   const [view, setView] = useState<AppView>("home");
   const [site, setSite] = useState<SiteData>();
+  const [indexedUniverse, setIndexedUniverse] = useState<IndexedUniverse>();
+  const [publicationProfiles, setPublicationProfiles] = useState<
+    PublicationProfile[]
+  >([]);
+  const [activePublicationId, setActivePublicationId] = useState("default");
+  const [publicationMode, setPublicationMode] =
+    useState<PublicationMode>("preview");
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [initialReady, setInitialReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -347,7 +289,7 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   const recentUniverseAttemptedRef = useRef<string | undefined>(undefined);
   const startupStartedAtRef = useRef(Date.now());
   const startupReadyTimerRef = useRef<number | undefined>(undefined);
-  /** Serialized appearance last known to match `.everend/.compendium/settings.json` on disk. */
+  /** Serialized appearance last known to match `.everend/.compendium/appearance.json` on disk. */
   const vaultAppearanceOnDiskRef = useRef<string | undefined>(undefined);
 
   const finishInitialStartup = useCallback(() => {
@@ -362,12 +304,15 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
     }, remaining);
   }, []);
 
-  useEffect(() => () => {
-    if (startupReadyTimerRef.current !== undefined) {
-      window.clearTimeout(startupReadyTimerRef.current);
-      startupReadyTimerRef.current = undefined;
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (startupReadyTimerRef.current !== undefined) {
+        window.clearTimeout(startupReadyTimerRef.current);
+        startupReadyTimerRef.current = undefined;
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     document.documentElement.dataset.theme =
@@ -387,7 +332,11 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
     if (vaultAppearanceOnDiskRef.current === content) return;
     const timer = setTimeout(() => {
       vaultAppearanceOnDiskRef.current = content;
-      void saveUniverseTextFile(vaultPath, VAULT_APPEARANCE_SETTINGS_PATH, content)
+      void saveUniverseTextFile(
+        vaultPath,
+        VAULT_APPEARANCE_SETTINGS_PATH,
+        content,
+      )
         .then((result) => {
           if (!result.ok && vaultAppearanceOnDiskRef.current === content) {
             vaultAppearanceOnDiskRef.current = undefined;
@@ -427,9 +376,9 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
     setRoute(nextRoute);
   }, []);
 
-  const applySite = useCallback((data: SiteData) => {
+  const applySite = useCallback((data: SiteData, resetRoute = true) => {
     setSite(data);
-    setRoute("/");
+    if (resetRoute) setRoute("/");
     setView("reader");
     setLoadState("idle");
     setErrorMessage("");
@@ -446,20 +395,38 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
       setErrorMessage("");
       try {
         const result = await indexVault(path);
-        const data = assembleSiteData(
+        const indexed = assembleIndexedUniverse(
           result.rootPath,
           result.files,
           sanitizeDom,
         );
+        const loadedProfiles = loadPublicationProfiles(
+          result.files,
+          indexed.config,
+        );
+        const activeProfile = loadedProfiles.active;
+        const data = projectIndexedUniverse(
+          indexed,
+          "preview",
+          activeProfile,
+          sanitizeDom,
+        );
+        if (loadedProfiles.warnings.length) {
+          data.warnings = [...data.warnings, ...loadedProfiles.warnings];
+        }
+        setIndexedUniverse(indexed);
+        setPublicationProfiles(loadedProfiles.profiles);
+        setActivePublicationId(activeProfile.id);
+        setPublicationMode("preview");
         const vaultAppearance = parseVaultAppearanceSettings(result.files);
         // Track what's on disk for this universe so the appearance-save
         // effect doesn't immediately re-write the file it just loaded, but
-        // does seed `.everend/.compendium/settings.json` the first time a
+        // does seed `.everend/.compendium/appearance.json` the first time a
         // universe without one opens.
         vaultAppearanceOnDiskRef.current = vaultAppearance
           ? serializeVaultAppearance(vaultAppearance)
           : undefined;
-        applySite(data);
+        applySite(data, true);
         setSettings((current) =>
           applyVaultAppearanceSettings(
             rememberUniverse(current, result.rootPath),
@@ -475,7 +442,7 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
         suiteChrome?.onReady?.();
       }
     },
-    [applySite, finishInitialStartup],
+    [applySite, finishInitialStartup, suiteChrome?.onReady],
   );
 
   useEffect(() => {
@@ -513,10 +480,18 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
 
   useEffect(() => {
     if (suiteChrome?.sharedUniversePath) return;
-    if (!isTauriRuntime() || !settings.recentUniverse || settings.recentUniverse.startsWith("browser:")) {
+    if (
+      !isTauriRuntime() ||
+      !settings.recentUniverse ||
+      settings.recentUniverse.startsWith("browser:")
+    ) {
       finishInitialStartup();
     }
-  }, [finishInitialStartup, settings.recentUniverse, suiteChrome?.sharedUniversePath]);
+  }, [
+    finishInitialStartup,
+    settings.recentUniverse,
+    suiteChrome?.sharedUniversePath,
+  ]);
 
   const openUniverse = useCallback(async () => {
     if (!isTauriRuntime()) {
@@ -603,25 +578,124 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
     [site],
   );
 
-  const savePublicationStatuses = useCallback(
-    async (statuses: string[]) => {
+  const savePublicationProfile = useCallback(
+    async (profile: PublicationProfile) => {
       if (!site) return;
+      const result = await saveUniverseTextFile(
+        site.vaultPath,
+        publicationRelativePath(profile.id),
+        serializePublicationProfile(profile),
+      );
+      if (!result.ok) {
+        throw new Error(
+          result.message ?? "Could not save publication profile.",
+        );
+      }
+      setPublicationProfiles((current) => {
+        const next = current.filter((item) => item.id !== profile.id);
+        return [...next, profile].sort((left, right) =>
+          left.name.localeCompare(right.name),
+        );
+      });
+    },
+    [site],
+  );
+
+  const activatePublicationProfile = useCallback(
+    async (profile: PublicationProfile) => {
+      if (!site || !indexedUniverse) return;
       const nextConfig = {
-        ...site.config,
-        publication: { ...site.config.publication, statuses },
+        ...indexedUniverse.config,
+        publication: {
+          ...indexedUniverse.config.publication,
+          activeProfileId: profile.id,
+        },
       };
       const result = await saveUniverseTextFile(
         site.vaultPath,
         ".everend/.compendium/settings.json",
         serializeConfig(nextConfig),
       );
-      if (!result.ok)
+      if (!result.ok) {
         throw new Error(
-          result.message ?? "Could not save publication settings.",
+          result.message ?? "Could not activate publication profile.",
         );
-      await loadUniverse(site.vaultPath);
+      }
+      const nextIndexed = { ...indexedUniverse, config: nextConfig };
+      setIndexedUniverse(nextIndexed);
+      setActivePublicationId(profile.id);
+      setPublicationMode("preview");
+      applySite(
+        projectIndexedUniverse(nextIndexed, "preview", profile, sanitizeDom),
+        false,
+      );
     },
-    [loadUniverse, site],
+    [applySite, indexedUniverse, site],
+  );
+
+  const deletePublicationProfile = useCallback(
+    async (profile: PublicationProfile) => {
+      if (!site || publicationProfiles.length <= 1) {
+        throw new Error("Keep at least one publication profile.");
+      }
+      const result = await deleteUniverseFile(
+        site.vaultPath,
+        publicationRelativePath(profile.id),
+      );
+      if (!result.ok) {
+        throw new Error(
+          result.message ?? "Could not delete publication profile.",
+        );
+      }
+      const remaining = publicationProfiles.filter(
+        (item) => item.id !== profile.id,
+      );
+      setPublicationProfiles(remaining);
+      if (activePublicationId === profile.id) {
+        await activatePublicationProfile(remaining[0]);
+      }
+    },
+    [
+      activatePublicationProfile,
+      activePublicationId,
+      publicationProfiles,
+      site,
+    ],
+  );
+
+  const previewPublicationProfile = useCallback(
+    (profile: PublicationProfile) => {
+      if (!indexedUniverse) return;
+      setPublicationMode("preview");
+      applySite(
+        projectIndexedUniverse(
+          indexedUniverse,
+          "preview",
+          profile,
+          sanitizeDom,
+        ),
+        false,
+      );
+      setShowSettings(false);
+    },
+    [applySite, indexedUniverse],
+  );
+
+  const switchPublicationMode = useCallback(
+    (nextMode: PublicationMode) => {
+      if (!indexedUniverse) return;
+      const profile = profileForId(
+        publicationProfiles,
+        activePublicationId,
+        indexedUniverse.config,
+      );
+      setPublicationMode(nextMode);
+      applySite(
+        projectIndexedUniverse(indexedUniverse, nextMode, profile, sanitizeDom),
+        false,
+      );
+    },
+    [activePublicationId, applySite, indexedUniverse, publicationProfiles],
   );
 
   useEffect(() => {
@@ -674,7 +748,15 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   }
 
   if (!suiteChrome && !initialReady) {
-    return <BrandLoadingScreen message={loadState === "loading" ? "Opening your universe…" : "Preparing your reading space…"} />;
+    return (
+      <BrandLoadingScreen
+        message={
+          loadState === "loading"
+            ? "Opening your universe…"
+            : "Preparing your reading space…"
+        }
+      />
+    );
   }
 
   if (view === "home" || !site) {
@@ -748,10 +830,17 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
             section={settingsSection}
             onSectionChange={changeSettingsSection}
             onClose={() => setShowSettings(false)}
-            localePreference={suiteChrome?.suiteSettings?.localePreference ?? settings.localePreference}
-            onLocalePreferenceChange={(localePreference) => suiteChrome?.suiteSettings
-              ? suiteChrome.suiteSettings.onLocalePreferenceChange(localePreference)
-              : setSettings((current) => ({ ...current, localePreference }))}
+            localePreference={
+              suiteChrome?.suiteSettings?.localePreference ??
+              settings.localePreference
+            }
+            onLocalePreferenceChange={(localePreference) =>
+              suiteChrome?.suiteSettings
+                ? suiteChrome.suiteSettings.onLocalePreferenceChange(
+                    localePreference,
+                  )
+                : setSettings((current) => ({ ...current, localePreference }))
+            }
             onOpenDocs={() => void openExternal(COMPENDIUM_DOCS_URL)}
             appearance={
               <>
@@ -804,7 +893,8 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
                   <span className="eyebrow">Continue reading</span>
                   <strong>{universeDisplayName(site)}</strong>
                   <span>
-                    {site.entities.length} entries · {site.stories.length} stories
+                    {site.entities.length} entries · {site.stories.length}{" "}
+                    stories
                   </span>
                 </span>
               </button>
@@ -857,6 +947,13 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
 
   const hasTimeline = timelineEntries(site).length > 0;
   const hasMaps = mapDefinitions(site).length > 0;
+  const activePublication = indexedUniverse
+    ? profileForId(
+        publicationProfiles,
+        activePublicationId,
+        indexedUniverse.config,
+      )
+    : undefined;
 
   return (
     <main className="app-shell compendium-shell">
@@ -1043,6 +1140,38 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
         </nav>
 
         <div className="reader-top-right">
+          <div
+            className="publication-mode-switch"
+            role="group"
+            aria-label="Publication view"
+          >
+            <button
+              type="button"
+              className={publicationMode === "all" ? "active" : ""}
+              onClick={() => switchPublicationMode("all")}
+              title="Inspect all valid content locally"
+            >
+              All
+            </button>
+            <button
+              type="button"
+              className={publicationMode === "preview" ? "active" : ""}
+              onClick={() => switchPublicationMode("preview")}
+              title="View exactly what the active profile exports"
+            >
+              Preview
+            </button>
+          </div>
+          <span
+            className="publication-profile-badge"
+            title="Active publication profile"
+          >
+            {(publicationMode === "preview"
+              ? site.publication?.name
+              : undefined) ??
+              activePublication?.name ??
+              "Default publication"}
+          </span>
           <div className="mode-switch" role="group" aria-label="Reading mode">
             <button
               type="button"
@@ -1107,10 +1236,17 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
           section={settingsSection}
           onSectionChange={changeSettingsSection}
           onClose={() => setShowSettings(false)}
-          localePreference={suiteChrome?.suiteSettings?.localePreference ?? settings.localePreference}
-          onLocalePreferenceChange={(localePreference) => suiteChrome?.suiteSettings
-            ? suiteChrome.suiteSettings.onLocalePreferenceChange(localePreference)
-            : setSettings((current) => ({ ...current, localePreference }))}
+          localePreference={
+            suiteChrome?.suiteSettings?.localePreference ??
+            settings.localePreference
+          }
+          onLocalePreferenceChange={(localePreference) =>
+            suiteChrome?.suiteSettings
+              ? suiteChrome.suiteSettings.onLocalePreferenceChange(
+                  localePreference,
+                )
+              : setSettings((current) => ({ ...current, localePreference }))
+          }
           onOpenDocs={() => void openExternal(COMPENDIUM_DOCS_URL)}
           appearance={
             <>
@@ -1143,10 +1279,17 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
           universe={
             <div className="universe-settings-summary">
               <UniverseProfileEditor site={site} onSave={saveUniverseProfile} />
-              <PublicationSettings
-                site={site}
-                onSave={savePublicationStatuses}
-              />
+              {indexedUniverse ? (
+                <PublicationManager
+                  indexed={indexedUniverse}
+                  profiles={publicationProfiles}
+                  activeProfileId={activePublicationId}
+                  onSave={savePublicationProfile}
+                  onActivate={activatePublicationProfile}
+                  onDelete={deletePublicationProfile}
+                  onPreview={previewPublicationProfile}
+                />
+              ) : null}
               <small>{site.vaultPath}</small>
               <button
                 type="button"
@@ -1229,7 +1372,13 @@ function App({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
           onClose={() => setCorrectionEntity(undefined)}
         />
       ) : null}
-    {showFeedback ? <FeedbackModal screen="reader" onClose={() => setShowFeedback(false)} onOpenExternal={openExternal} /> : null}
+      {showFeedback ? (
+        <FeedbackModal
+          screen="reader"
+          onClose={() => setShowFeedback(false)}
+          onOpenExternal={openExternal}
+        />
+      ) : null}
     </main>
   );
 }

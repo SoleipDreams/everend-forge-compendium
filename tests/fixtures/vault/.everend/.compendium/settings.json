@@ -1,0 +1,12 @@
+{
+  "specVersion": "0.1",
+  "site": {
+    "title": "Northwatch Compendium"
+  },
+  "publication": {
+    "statuses": ["canon"]
+  },
+  "narrative": {
+    "mode": "scenes-and-relations"
+  }
+}
