@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist-app/
 dist-check/
+dist-review-check/
 .astro/
 coverage/
 .DS_Store
