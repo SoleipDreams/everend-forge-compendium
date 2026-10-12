@@ -21,7 +21,7 @@ Everend Compendium turns a WorldNotion vault and PathBranching's saved stories i
 
 ## Product direction
 
-Compendium is the reading, consultation, and publication surface of Everend Forge. Its direction covers connected story creation for video games, roleplaying, and literature, complementing WorldNotion's canon and PathBranching's narrative structures. See [docs/PRODUCT_DIRECTION.md](docs/PRODUCT_DIRECTION.md) for the milestones and Compendium's role in each one.
+Compendium is the reading, consultation, and publication surface of Everend Forge. Its product milestones are **1.0 Wiki integral**, **2.0 Role editions**, and **3.0 Editorial assembly**; these are separate from the shared Forge 0.5 milestone and this package's version. See [docs/PRODUCT_DIRECTION.md](docs/PRODUCT_DIRECTION.md) for formats, boundaries and the development mockup.
 
 ## Use
 
@@ -34,7 +34,7 @@ npm run site:dev -- /path/to/universe
 npx tsx cli/cli.ts markdown /path/to/universe --out=wiki-export
 ```
 
-The preferred configuration is `.everend/.compendium/settings.json`. Existing vaults may keep using `.everend/compendium.yaml`; it is read as a legacy fallback and is never migrated or deleted automatically. The settings file controls the site title, visual theme, navigation order, and default statuses. Publication profiles live at `.everend/.compendium/publications/<profile-id>.json` and combine status rules with direct includes/excludes. `Preview` is the exportable projection; `All` is available only for local inspection. The reader projects only PathBranching story, sequence, event, text, description, and canon references; it deliberately omits choices, conditions, variables, consequences, and graph state.
+The preferred configuration is `.everend/.compendium/settings.json`. Existing vaults may keep using `.everend/compendium.yaml`; it is read as a legacy fallback and is never migrated or deleted automatically. The settings file controls the site title, visual theme, navigation order, and default statuses. Publication profiles live at `.everend/.compendium/publications/<profile-id>.json` and combine status rules with direct includes/excludes. `Preview` is the exportable projection; `All` is available only for local inspection. The reader projects PathBranching story, sequence, event, text, description, canon references, and safe narrative choices. A choice contains only its visible label and destination. Conditional routes are diagnosed and omitted; conditions, variables, consequences, and graph state remain private authoring/runtime data.
 
 Useful publication commands:
 

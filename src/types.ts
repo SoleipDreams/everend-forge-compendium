@@ -131,8 +131,17 @@ export type StoryEvent = {
   coverImage?: string;
   /** Additional editorial scene images attached to dialogue beats. */
   images?: string[];
+  /** Safe reader projection. Conditions and runtime data are never serialized. */
+  choices?: StoryChoice[];
   route: string;
   html: string;
+};
+export type StoryChoice = {
+  id: string;
+  label: string;
+  targetEventId: string;
+  targetRoute: string;
+  destinationName: string;
 };
 export type Story = {
   id: string;

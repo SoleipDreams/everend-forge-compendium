@@ -1,0 +1,9 @@
+{
+  "storageVersion": "0.2",
+  "event": {
+    "id": "event:departure",
+    "name": "Beyond the northern gate",
+    "text": { "format": "plain", "content": "The gate opens onto the old road." },
+    "canonRefs": ["location:northwatch"]
+  }
+}

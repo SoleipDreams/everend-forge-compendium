@@ -22,7 +22,7 @@ export type PrimaryFontId = (typeof PRIMARY_FONT_OPTIONS)[number]["id"];
 export function normalizePrimaryFont(value: unknown): PrimaryFontId {
   return PRIMARY_FONT_OPTIONS.some((option) => option.id === value)
     ? (value as PrimaryFontId)
-    : "serif";
+    : "sans";
 }
 
 export function primaryFontCssValue(font: PrimaryFontId) {

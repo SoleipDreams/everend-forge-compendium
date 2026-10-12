@@ -1,4 +1,6 @@
 export type ThemeId =
+  | "forge-mono-light"
+  | "forge-mono-dark"
   | "worldnotion-light"
   | "worldnotion-dark"
   | "github"
@@ -21,6 +23,18 @@ export type ThemeDefinition = {
 };
 
 export const THEMES: ThemeDefinition[] = [
+  {
+    id: "forge-mono-light",
+    label: "Everend Forge Light",
+    isDark: false,
+    mode: "light",
+  },
+  {
+    id: "forge-mono-dark",
+    label: "Everend Forge Dark",
+    isDark: true,
+    mode: "dark",
+  },
   {
     id: "worldnotion-light",
     label: "WorldNotion Light",
@@ -58,6 +72,8 @@ export const THEMES: ThemeDefinition[] = [
 export const THEME_IDS = THEMES.map((theme) => theme.id);
 
 const TOGGLED_THEME: Record<ThemeId, ThemeId> = {
+  "forge-mono-light": "forge-mono-dark",
+  "forge-mono-dark": "forge-mono-light",
   "worldnotion-light": "worldnotion-dark",
   "worldnotion-dark": "worldnotion-light",
   github: "github-dark",

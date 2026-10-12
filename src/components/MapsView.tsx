@@ -1,9 +1,11 @@
+import { useCompendiumText } from "./compendiumPresentation";
 import { useEffect, useMemo, useState } from "react";
 import type { Entity, SiteData } from "../types";
 import { findMarkdownAssets } from "../lib/markdown";
 import { stableSlug } from "../lib/paths";
 import { isTauriRuntime, vaultAssetDataUrl } from "../tauriBridge";
 import type { ReaderNavigation } from "./Reader";
+import { useSurfaceMotion } from "../useSurfaceMotion";
 
 type MapDefinition = {
   entity: Entity;
@@ -35,9 +37,11 @@ export function MapsView({
   site: SiteData;
   navigate: ReaderNavigation;
 }) {
+  const t = useCompendiumText();
   const maps = useMemo(() => mapDefinitions(site), [site]);
   const [activeId, setActiveId] = useState<string>();
   const active = maps.find((map) => map.entity.id === activeId) ?? maps[0];
+  const surface = useSurfaceMotion<HTMLDivElement>(active?.entity.id);
   const [imageUrl, setImageUrl] = useState<string>();
   const [imageError, setImageError] = useState("");
 
@@ -46,7 +50,12 @@ export function MapsView({
     setImageError("");
     if (!active?.imagePath) return;
     if (!isTauriRuntime()) {
-      setImageError("Map images load in the desktop app.");
+      setImageError(
+        t(
+          "Map images load in the desktop app.",
+          "Las imágenes de mapas se cargan en la aplicación de escritorio.",
+        ),
+      );
       return;
     }
     let disposed = false;
@@ -67,21 +76,29 @@ export function MapsView({
   if (maps.length === 0) {
     return (
       <section className="page-title">
-        <p className="chapter">Maps</p>
-        <h1>No maps published yet.</h1>
+        <p className="chapter">{t("Maps", "Mapas")}</p>
+        <h1>
+          {t("No maps published yet.", "Todavía no hay mapas publicados.")}
+        </h1>
         <p>
-          Create an entity with <code>type: Map</code> whose body embeds the map
-          image. Other entities can pin themselves with <code>map</code>,{" "}
-          <code>mapX</code>, and <code>mapY</code> (0–100) frontmatter.
+          {t("Create an entity with", "Crea una ficha con")}{" "}
+          <code>type: Map</code>{" "}
+          {t(
+            "whose body embeds the map image. Other entities can pin themselves with",
+            "e incluye la imagen del mapa en su contenido. Otras fichas pueden situarse mediante",
+          )}{" "}
+          <code>map</code>, <code>mapX</code>
+          {t(", and", ", y")} <code>mapY</code>{" "}
+          {t("(0–100) frontmatter.", "(0–100) en su frontmatter.")}{" "}
         </p>
       </section>
     );
   }
 
   return (
-    <div className="maps-view">
+    <div ref={surface} className="maps-view">
       <header className="maps-header">
-        <p className="chapter">Atlas</p>
+        <p className="chapter">{t("Atlas", "Atlas")}</p>
         <h1>{active.entity.name}</h1>
         {maps.length > 1 ? (
           <div className="maps-tabs" role="tablist">
@@ -121,16 +138,21 @@ export function MapsView({
         ) : (
           <div className="map-placeholder">
             {active.imagePath
-              ? imageError || "Loading map..."
-              : "This map entity has no embedded image."}
+              ? imageError || t("Loading map…", "Cargando mapa…")
+              : t(
+                  "This map entity has no embedded image.",
+                  "Esta ficha de mapa no tiene una imagen incrustada.",
+                )}
           </div>
         )}
       </div>
       <footer className="maps-footer">
         <button type="button" onClick={() => navigate(active.entity.route)}>
-          Read about {active.entity.name}
+          {t("Read about", "Leer sobre")} {active.entity.name}
         </button>
-        <span>{active.pins.length} pinned entries</span>
+        <span>
+          {active.pins.length} {t("pinned entries", "fichas situadas")}
+        </span>
       </footer>
     </div>
   );

@@ -5,6 +5,8 @@ import { siteAssetPath, sitePath } from "../../src/lib/site-links";
 const data = getSiteData();
 const featured = data.entities[0];
 const baseUrl = data.config.site?.baseUrl;
+const types = Array.from(new Set(data.entities.map((entity) => entity.type))).sort();
+const categoryId = (type: string) => `archive-${encodeURIComponent(type)}`;
 const cover = data.config.site?.coverImage ? `linear-gradient(90deg, rgba(3,18,29,.9), rgba(3,18,29,.2)), url('${siteAssetPath(data.config.site.coverImage, baseUrl)}')` : undefined;
 ---
 <BaseLayout title={data.title}>
@@ -12,5 +14,6 @@ const cover = data.config.site?.coverImage ? `linear-gradient(90deg, rgba(3,18,2
     <div><p class="chapter">The living archive</p><h1>{data.title}</h1><p>{data.description}</p>{featured && <a class="action" href={sitePath(featured.route, baseUrl)}>Begin reading</a>}</div>
   </section>
   <section class="intro"><p class="kicker">A world in reference</p><h2>Every person, place, and story in one readable edition.</h2><p>This Compendium is generated from portable Markdown canon and editorial story scenes. Follow links, explore related entries, or search the archive.</p></section>
-  <section class="directory"><h2>Browse the archive</h2><div class="type-list">{Array.from(new Set(data.entities.map((entity) => entity.type))).sort().map((type) => <a href={`#${type}`}><span>{type}</span><strong>{data.entities.filter((entity) => entity.type === type).length}</strong></a>)}</div></section>
+  <section class="directory"><h2>Browse the archive</h2><div class="type-list">{types.map((type) => <a href={`#${categoryId(type)}`}><span>{type}</span><strong>{data.entities.filter((entity) => entity.type === type).length}</strong></a>)}{data.stories.length > 0 && <a href={sitePath("/stories/", baseUrl)}><span>Stories</span><strong>{data.stories.length}</strong></a>}</div></section>
+  {types.map((type) => <section class="directory archive-category" id={categoryId(type)}><h2>{type}</h2><ul>{data.entities.filter((entity) => entity.type === type).map((entity) => <li><a href={sitePath(entity.route, baseUrl)}>{entity.name}</a></li>)}</ul></section>)}
 </BaseLayout>

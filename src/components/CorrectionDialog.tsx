@@ -1,7 +1,13 @@
+import { useCompendiumText } from "./compendiumPresentation";
 import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, FilePenLine, X } from "lucide-react";
 import { saveUniverseTextFile } from "../tauriBridge";
+import { useDialogFocus } from "../useDialogFocus";
 import type { Entity, SiteData } from "../types";
+import {
+  useUniverseSwitchGuard,
+  type RegisterUniverseSwitchGuard,
+} from "../useUniverseSwitchGuard";
 
 function slug(value: string) {
   return value
@@ -42,21 +48,36 @@ function simpleDiff(before: string, after: string) {
 }
 
 export function CorrectionDialog({
+  active,
   site,
   entity,
   onClose,
+  registerUniverseSwitchGuard,
 }: {
+  active?: boolean;
   site: SiteData;
   entity: Entity;
   onClose: () => void;
+  registerUniverseSwitchGuard?: RegisterUniverseSwitchGuard;
 }) {
+  const t = useCompendiumText();
   const [proposedContent, setProposedContent] = useState(entity.sourceContent);
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<
     "editing" | "saving" | "saved" | "error"
   >("editing");
   const [message, setMessage] = useState("");
+  const dialogRef = useDialogFocus({
+    active,
+    onClose,
+    canClose: status !== "saving",
+  });
   const changed = proposedContent !== entity.sourceContent;
+  useUniverseSwitchGuard(
+    registerUniverseSwitchGuard,
+    status === "saving" ||
+      (status !== "saved" && (changed || Boolean(note.trim()))),
+  );
   const changedLineCount = useMemo(
     () =>
       simpleDiff(entity.sourceContent, proposedContent)
@@ -68,32 +89,32 @@ export function CorrectionDialog({
   async function saveProposal() {
     if (!changed) return;
     setStatus("saving");
-    const timestamp = new Date();
-    const suffix = timestamp.toISOString().replace(/[:.]/g, "-");
-    const id = `change:${slug(entity.id)}:compendium-${suffix}`;
-    const proposal = {
-      specVersion: "0.1",
-      id,
-      kind: "canon-change-set",
-      sourceApp: "compendium",
-      target: { entityId: entity.id, path: entity.path },
-      base: {
-        content: entity.sourceContent,
-        modifiedMs: entity.modifiedMs ?? 0,
-        contentHash: await contentHash(entity.sourceContent),
-        capturedAt: timestamp.toISOString(),
-      },
-      proposed: {
-        content: proposedContent,
-        diff: simpleDiff(entity.sourceContent, proposedContent),
-      },
-      status: "proposed",
-      revision: 1,
-      createdAt: timestamp.toISOString(),
-      updatedAt: timestamp.toISOString(),
-      note: note.trim() || undefined,
-    };
     try {
+      const timestamp = new Date();
+      const suffix = timestamp.toISOString().replace(/[:.]/g, "-");
+      const id = `change:${slug(entity.id)}:compendium-${suffix}`;
+      const proposal = {
+        specVersion: "0.1",
+        id,
+        kind: "canon-change-set",
+        sourceApp: "compendium",
+        target: { entityId: entity.id, path: entity.path },
+        base: {
+          content: entity.sourceContent,
+          modifiedMs: entity.modifiedMs ?? 0,
+          contentHash: await contentHash(entity.sourceContent),
+          capturedAt: timestamp.toISOString(),
+        },
+        proposed: {
+          content: proposedContent,
+          diff: simpleDiff(entity.sourceContent, proposedContent),
+        },
+        status: "proposed",
+        revision: 1,
+        createdAt: timestamp.toISOString(),
+        updatedAt: timestamp.toISOString(),
+        note: note.trim() || undefined,
+      };
       const relativePath = `.everend/changes/${slug(entity.id)}-compendium-${suffix}.json`;
       const result = await saveUniverseTextFile(
         site.vaultPath,
@@ -101,8 +122,16 @@ export function CorrectionDialog({
         `${JSON.stringify(proposal, null, 2)}\n`,
       );
       if (!result.ok)
-        throw new Error(result.message ?? "Could not save proposal.");
-      setMessage(`Saved for review in ${relativePath}`);
+        throw new Error(
+          result.message ??
+            t("Could not save proposal.", "No se pudo guardar la propuesta."),
+        );
+      setMessage(
+        t(
+          `Saved for review in ${relativePath}`,
+          `Guardado para revisión en ${relativePath}`,
+        ),
+      );
       setStatus("saved");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
@@ -115,10 +144,13 @@ export function CorrectionDialog({
       className="dialog-backdrop"
       role="presentation"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget && status !== "saving")
+          onClose();
       }}
     >
       <section
+        ref={dialogRef}
+        tabIndex={-1}
         className="correction-dialog"
         role="dialog"
         aria-modal="true"
@@ -126,8 +158,12 @@ export function CorrectionDialog({
       >
         <header className="dialog-header">
           <div>
-            <span className="dialog-kicker">Reviewable change</span>
-            <h2 id="correction-title">Suggest a correction</h2>
+            <span className="dialog-kicker">
+              {t("Reviewable change", "Cambio para revisión")}
+            </span>
+            <h2 id="correction-title">
+              {t("Suggest a correction", "Sugerir una corrección")}
+            </h2>
             <p>
               {entity.name} · {entity.path}
             </p>
@@ -136,7 +172,8 @@ export function CorrectionDialog({
             type="button"
             className="dialog-close"
             onClick={onClose}
-            title="Close"
+            disabled={status === "saving"}
+            title={t("Close", "Cerrar")}
           >
             <X size={18} />
           </button>
@@ -144,25 +181,33 @@ export function CorrectionDialog({
         <div className="correction-safety-note">
           <AlertTriangle size={16} />
           <span>
-            This creates a proposal for WorldNotion. The Canon file is never
-            changed here.
+            {t(
+              "This creates a proposal for WorldNotion. The Canon file is never changed here.",
+              "Se creará una propuesta para WorldNotion. El archivo del canon se conserva.",
+            )}{" "}
           </span>
         </div>
         {status === "saved" ? (
           <div className="correction-success">
             <CheckCircle2 size={34} />
-            <h3>Correction ready for review</h3>
+            <h3>
+              {t(
+                "Correction ready for review",
+                "Corrección lista para revisión",
+              )}
+            </h3>
             <p>{message}</p>
             <button type="button" className="primary-action" onClick={onClose}>
-              Done
+              {t("Done", "Listo")}{" "}
             </button>
           </div>
         ) : (
           <>
             <div className="correction-editor-grid">
               <label>
-                <span>Proposed Markdown</span>
+                <span>{t("Proposed Markdown", "Markdown propuesto")}</span>
                 <textarea
+                  disabled={status === "saving"}
                   value={proposedContent}
                   onChange={(event) => setProposedContent(event.target.value)}
                   spellCheck
@@ -172,19 +217,30 @@ export function CorrectionDialog({
                 <FilePenLine size={20} />
                 <strong>
                   {changed
-                    ? `${changedLineCount} changed lines`
-                    : "No changes yet"}
+                    ? t(
+                        `${changedLineCount} changed lines`,
+                        `${changedLineCount} líneas modificadas`,
+                      )
+                    : t("No changes yet", "Todavía no hay cambios")}
                 </strong>
                 <p>
-                  Edit the source exactly as it should appear. Frontmatter is
-                  included so metadata corrections are possible.
+                  {t(
+                    "Edit the source exactly as it should appear. Frontmatter is included so metadata corrections are possible.",
+                    "Edita el contenido como debe aparecer. Puedes corregir también los metadatos del frontmatter.",
+                  )}{" "}
                 </p>
                 <label>
-                  <span>Reason for the correction</span>
+                  <span>
+                    {t("Reason for the correction", "Motivo de la corrección")}
+                  </span>
                   <textarea
+                    disabled={status === "saving"}
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
-                    placeholder="Explain what is wrong and why this change helps…"
+                    placeholder={t(
+                      "Explain what is wrong and why this change helps…",
+                      "Explica el error y el motivo de este cambio…",
+                    )}
                   />
                 </label>
               </aside>
@@ -193,8 +249,12 @@ export function CorrectionDialog({
               <p className="dialog-error">{message}</p>
             ) : null}
             <footer className="dialog-footer">
-              <button type="button" onClick={onClose}>
-                Cancel
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={status === "saving"}
+              >
+                {t("Cancel", "Cancelar")}{" "}
               </button>
               <button
                 type="button"
@@ -203,8 +263,11 @@ export function CorrectionDialog({
                 onClick={() => void saveProposal()}
               >
                 {status === "saving"
-                  ? "Saving proposal…"
-                  : "Send to WorldNotion review"}
+                  ? t("Saving proposal…", "Guardando propuesta…")
+                  : t(
+                      "Send to WorldNotion review",
+                      "Enviar a revisión en WorldNotion",
+                    )}
               </button>
             </footer>
           </>

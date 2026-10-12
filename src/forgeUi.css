@@ -1,0 +1,531 @@
+/* Public visual contract; this app remains independent of the private Suite. */
+.forge-compendium {
+  --ef-ui-font: Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --ef-bg: var(--cp-bg, #f6f7f5);
+  --ef-panel: var(--cp-panel, #fff);
+  --ef-panel-soft: var(--cp-panel-2, #f1f3f0);
+  --ef-text: var(--cp-text, #202522);
+  --ef-muted: var(--cp-muted, #737b75);
+  --ef-border: var(--cp-border, #dcded9);
+  --ef-accent: var(--cp-accent, #3f7f64);
+  --ef-accent-soft: color-mix(in srgb, var(--ef-accent) 12%, var(--ef-panel));
+  --ef-radius-control: 6px;
+  --ef-radius-card: 8px;
+  --ef-radius-panel: 10px;
+  --ef-radius-dialog: 12px;
+  --ef-space-1: 4px;
+  --ef-space-2: 8px;
+  --ef-space-3: 12px;
+  --ef-space-4: 16px;
+  --ef-space-6: 24px;
+  --ef-motion-fast: 120ms;
+  --ef-motion-normal: 180ms;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  container: compendium / inline-size;
+  font-family: var(--ef-ui-font);
+  font-size: 14px;
+  color: var(--ef-text);
+  background: var(--ef-bg);
+}
+.forge-compendium [hidden] {
+  display: none !important;
+}
+.forge-compendium fieldset.universe-profile-editor {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.forge-compendium :is(button, input, select, summary) {
+  font-family: var(--ef-ui-font);
+  font-size: 14px;
+}
+.forge-compendium :is(button, input, select) {
+  border-radius: var(--ef-radius-control);
+}
+.forge-compendium button {
+  min-height: 32px;
+  transition:
+    background-color var(--ef-motion-fast),
+    border-color var(--ef-motion-fast);
+}
+.forge-compendium
+  :is(button, summary, input, select, textarea, a):focus-visible {
+  outline: 2px solid var(--ef-accent);
+  outline-offset: 2px;
+}
+.forge-compendium .compendium-shell {
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  font-family: var(--ef-ui-font);
+  overflow: hidden;
+}
+.forge-compendium :is(.reader-top-bar, .home-topbar) {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: calc(100% - 16px);
+  min-width: 0;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  margin: 8px 8px 0;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 4px 6px;
+  background: var(--ef-panel);
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  box-shadow: none;
+}
+.forge-compendium :is(.reader-top-bar, .home-topbar) :is(button, input, summary) {
+  box-sizing: border-box;
+  min-height: 30px;
+  height: 30px;
+}
+.forge-compendium .forge-corner-menu {
+  flex-basis: 30px;
+  width: 30px;
+  height: 30px;
+}
+.forge-compendium :is(.home-topbar, .reader-top-bar) .forge-corner-button {
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+  border: 1px solid var(--ef-border);
+  background: var(--ef-panel-soft);
+  box-shadow: none;
+}
+.forge-compendium .forge-logo {
+  width: 20px;
+  height: 20px;
+}
+.forge-compendium .compendium-topbar-leading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.forge-compendium .home-topbar .brand {
+  min-width: 0;
+  gap: 8px;
+}
+.forge-compendium .home-topbar .app-brand-icon {
+  width: 30px;
+  height: 30px;
+}
+.forge-compendium .home-topbar .brand h1 {
+  font-size: 14px;
+  line-height: 16px;
+}
+.forge-compendium .home-topbar .brand p {
+  display: none;
+}
+.forge-compendium :is(.home-topbar, .reader-top-bar) .icon-button,
+.forge-compendium .reader-top-bar .reader-icon-button {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+}
+.forge-compendium .reader-top-left {
+  min-width: 0;
+  flex: 0 1 auto;
+  gap: 6px;
+}
+.forge-compendium .reader-universe-button {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 220px;
+  height: 30px;
+  padding-block: 0;
+}
+.forge-compendium .reader-top-right {
+  margin-left: auto;
+  min-width: 0;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+.forge-compendium .reader-top-right .search {
+  flex: 0 1 160px;
+  width: 160px;
+  min-width: 80px;
+}
+.forge-compendium .reader-top-right .search input {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding-block: 0;
+}
+.forge-compendium .reader-nav {
+  min-width: 0;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.forge-compendium .reader-nav button {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.forge-compendium .reader-nav button.active {
+  background: var(--ef-accent-soft);
+  color: var(--ef-accent);
+}
+.forge-compendium .reader-universe-copy strong {
+  font-family: var(--ef-ui-font);
+  font-size: 14px;
+}
+.forge-compendium
+  .suite-mode
+  .reader-top-left
+  > .reader-top-divider {
+  display: none;
+}
+.forge-compendium .suite-mode .reader-top-left {
+  padding-left: 0;
+}
+.forge-compendium
+  .suite-mode
+  .reader-top-right
+  > .reader-icon-button:not(.has-warning) {
+  display: none;
+}
+.forge-compendium .reader-publication-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--ef-accent-soft);
+  color: var(--ef-accent);
+}
+.forge-compendium .reader-publication-button.active {
+  border-color: var(--ef-accent);
+}
+.forge-compendium .reader-view-options {
+  position: relative;
+  flex-shrink: 0;
+}
+.forge-compendium .reader-view-options summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 6px;
+  color: var(--ef-muted);
+}
+.forge-compendium .reader-view-options-content {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 40;
+  display: grid;
+  gap: 12px;
+  width: 260px;
+  padding: 16px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+  box-shadow: 0 12px 32px #0002;
+}
+.forge-compendium .publication-profile-badge {
+  max-width: none;
+  font-size: 12px;
+}
+.forge-compendium .compendium-reading-surface {
+  min-height: 0;
+  overflow: hidden;
+}
+.forge-compendium .reader-shell {
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  background: var(--ef-bg);
+  overflow: hidden;
+}
+.forge-compendium .reader-shell.full-bleed {
+  grid-template-columns: minmax(0, 1fr);
+}
+.forge-compendium .toc {
+  overflow: auto;
+  padding: 20px 16px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+}
+.forge-compendium .toc section {
+  padding: 12px 0;
+  border: 0;
+}
+.forge-compendium .toc li button {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 14px;
+  text-align: left;
+  border-radius: 6px;
+}
+.forge-compendium .toc li button.active {
+  background: var(--ef-accent-soft);
+  color: var(--ef-accent);
+}
+.forge-compendium .reader-main {
+  padding: 32px;
+  min-width: 0;
+  overflow: auto;
+  min-height: 0;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--cp-reading-bg, var(--ef-panel));
+  font-family: var(--ef-primary-font, var(--ef-ui-font));
+}
+.forge-compendium .reader-shell.full-bleed .reader-main {
+  padding: 0;
+}
+.forge-compendium :is(.page-title, .entry-layout, .story-layout) {
+  max-width: 1120px;
+  margin-inline: auto;
+}
+.forge-compendium :is(.entry-heading h1, .page-title h1) {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+}
+.forge-compendium .entry-body {
+  max-width: 76ch;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.forge-compendium :is(.entry-cover-image, .entry-portrait-image, .cover-image) {
+  border-radius: 8px;
+}
+.forge-compendium :is(.settings-dialog, .correction-dialog, .feedback-dialog) {
+  border-radius: 12px;
+  font-family: var(--ef-ui-font);
+}
+.forge-compendium .publication-workspace {
+  overflow: auto;
+  padding: 24px;
+  background: var(--ef-bg);
+}
+.forge-compendium .publication-workspace-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto 24px;
+}
+.forge-compendium .publication-workspace-heading h1 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: -0.025em;
+}
+.forge-compendium .publication-workspace-heading .chapter {
+  margin: 0 0 8px;
+}
+.forge-compendium .publication-manager {
+  max-width: 1280px;
+  margin: auto;
+  padding: 24px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+  gap: 20px;
+}
+.forge-compendium .publication-draft-status {
+  margin: 0;
+  color: var(--ef-muted);
+  font-size: 12px;
+}
+.forge-compendium .publication-manager-header h3 {
+  font-size: 24px;
+}
+.forge-compendium .publication-manager-header p {
+  font-size: 14px;
+}
+.forge-compendium
+  :is(
+    .publication-summary span,
+    .publication-profile-strip small,
+    .publication-picker-row small,
+    .publication-footer-actions small
+  ) {
+  font-size: 12px;
+}
+.forge-compendium .publication-picker-row strong {
+  font-size: 14px;
+}
+.forge-compendium .publication-summary {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+.forge-compendium .publication-summary > div {
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--ef-panel-soft);
+  border: 0;
+}
+.forge-compendium .publication-summary strong {
+  font-size: 24px;
+}
+.forge-compendium .publication-picker-toolbar {
+  flex-wrap: wrap;
+}
+.forge-compendium .publication-manager-fields {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.forge-compendium .publication-search {
+  min-width: 180px;
+}
+.forge-compendium .reader-status {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 80;
+  max-width: min(520px, calc(100% - 32px));
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--ef-panel);
+  border: 1px solid var(--ef-accent);
+  font-family: var(--ef-ui-font);
+}
+/* The Suite rail and native controls reduce the authoring surface without
+   changing the viewport. Keep all right-side actions in the same row. */
+@container compendium (max-width: 1100px) {
+  .forge-compendium .reader-universe-copy > span {
+    display: none;
+  }
+  .forge-compendium .reader-top-bar {
+    gap: 6px;
+  }
+  .forge-compendium .reader-universe-button {
+    max-width: 160px;
+  }
+  .forge-compendium .reader-top-right .search {
+    flex-basis: 120px;
+    width: 120px;
+  }
+}
+@container compendium (max-width: 900px) {
+  .forge-compendium .reader-universe-button {
+    max-width: 96px;
+  }
+  .forge-compendium .reader-universe-copy {
+    flex: 1 1 auto;
+  }
+  .forge-compendium .reader-nav {
+    flex: 0 1 192px;
+    min-width: 120px;
+    gap: 2px;
+  }
+  .forge-compendium .reader-nav > :is(button, .graphs-menu) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .forge-compendium .reader-nav button {
+    width: 100%;
+    padding-inline: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  .forge-compendium .reader-publication-button {
+    width: 30px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .forge-compendium .reader-view-options summary {
+    padding-inline: 6px;
+    white-space: nowrap;
+  }
+  .forge-compendium .reader-top-right .search {
+    flex-basis: 100px;
+    width: 100px;
+  }
+}
+@container compendium (max-width: 720px) {
+  .forge-compendium .reader-universe-button {
+    max-width: 64px;
+  }
+  .forge-compendium .reader-top-right .search {
+    flex-basis: 80px;
+    width: 80px;
+  }
+  .forge-compendium .home-topbar .brand p {
+    display: none;
+  }
+}
+@media (max-width: 960px) {
+  .forge-compendium .reader-shell {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+  .forge-compendium .reader-shell.full-bleed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .forge-compendium .toc {
+    display: block;
+  }
+  .forge-compendium .reader-nav {
+    display: flex;
+  }
+  .forge-compendium .reader-main {
+    padding: 24px;
+  }
+  .forge-compendium .entry-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .forge-compendium .publication-picker-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .forge-compendium .reader-shell {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  .forge-compendium .toc {
+    max-height: 180px;
+    flex-shrink: 0;
+  }
+  .forge-compendium .reader-main {
+    overflow: visible;
+  }
+  .forge-compendium .home-topbar .brand p {
+    display: none;
+  }
+  .forge-compendium .publication-workspace {
+    padding: 12px;
+  }
+  .forge-compendium .publication-manager {
+    padding: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .forge-compendium *,
+  .forge-compendium *::before,
+  .forge-compendium *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

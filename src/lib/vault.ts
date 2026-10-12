@@ -8,6 +8,7 @@ import {
   type Sanitizer,
 } from "./markdown.js";
 import { entityRoute } from "./paths.js";
+import { isVisualDocument } from "./visual-document-marker.js";
 
 type ParsedDocument = { frontmatter: Record<string, unknown>; body: string };
 
@@ -76,6 +77,7 @@ export function discoverEntityStatuses(files: SourceFile[]) {
   for (const file of files) {
     const relativePath = file.relativePath.replaceAll("\\", "/");
     if (!isEntityDocument(relativePath)) continue;
+    if (isVisualDocument(file.content)) continue;
     const parsed = parseDocument(file.content);
     const status = parsed?.frontmatter.status;
     if (typeof status === "string" && status.trim())
@@ -94,6 +96,7 @@ function readEntities(files: SourceFile[], warnings: string[]): Entity[] {
   for (const file of files) {
     const relativePath = file.relativePath.replaceAll("\\", "/");
     if (!isEntityDocument(relativePath)) continue;
+    if (isVisualDocument(file.content)) continue;
     const parsed = parseDocument(file.content);
     if (!parsed) continue;
     const { id, type, name, status } = parsed.frontmatter;

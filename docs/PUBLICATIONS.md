@@ -33,6 +33,8 @@ Status matches and manual includes are unioned. Manual exclusions always win. Re
 
 Selecting a story includes its sequences and events. Selecting a sequence includes its events. Selecting an event preserves the minimum story and sequence structure needed to publish that event.
 
+Narrative choices are filtered with the same profile. A choice is shown only when its destination event is included in that edition. Conditional routes, routes to a missing destination, and choices whose destination was excluded are omitted and reported in diagnostics or the publication manifest. Compendium does not turn a conditional route into an unconditional link. Build a separate profile/site package for each audience that needs a different view, such as a director and player edition.
+
 ## CLI
 
 ```sh

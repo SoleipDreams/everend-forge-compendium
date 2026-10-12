@@ -1,7 +1,11 @@
+import { useCompendiumDiagnosticText } from "./compendiumPresentation";
+import { useCompendiumText } from "./compendiumPresentation";
+import { useOpenCompendiumIndex } from "./compendiumPresentation";
 import { useEffect, useState } from "react";
 import type { SiteData } from "../types";
 import { isTauriRuntime, vaultAssetDataUrl } from "../tauriBridge";
-import { orderedTypes, type ReaderNavigation } from "./Reader";
+import type { ReaderNavigation } from "./Reader";
+import { orderedTypes } from "./compendiumPresentation";
 
 export function CoverPage({
   site,
@@ -10,6 +14,9 @@ export function CoverPage({
   site: SiteData;
   navigate: ReaderNavigation;
 }) {
+  const t = useCompendiumText();
+  const diagnosticText = useCompendiumDiagnosticText();
+  const openIndex = useOpenCompendiumIndex();
   const featured = site.entities[0];
   const [coverUrl, setCoverUrl] = useState<string>();
   const coverImage = site.config.site?.coverImage;
@@ -42,7 +49,9 @@ export function CoverPage({
         }
       >
         <div>
-          <p className="chapter">The living archive</p>
+          <p className="chapter">
+            {t("The living archive", "El archivo vivo")}
+          </p>
           <h1>{site.title}</h1>
           <p>{site.description}</p>
           {featured ? (
@@ -51,31 +60,34 @@ export function CoverPage({
               className="action"
               onClick={() => navigate(featured.route)}
             >
-              Begin reading
+              {t("Begin reading", "Comenzar a leer")}{" "}
             </button>
           ) : null}
         </div>
       </section>
       <section className="intro">
-        <p className="kicker">A world in reference</p>
-        <h2>Every person, place, and story in one readable edition.</h2>
+        <p className="kicker">
+          {t("A world in reference", "Un mundo para consultar")}
+        </p>
+        <h2>
+          {t(
+            "Every person, place, and story in one readable edition.",
+            "Personas, lugares e historias en una misma edición de lectura.",
+          )}
+        </h2>
         <p>
-          This Compendium is generated from portable Markdown canon and
-          editorial story scenes. Follow links, explore related entries, or
-          search the archive.
+          {t(
+            "This Compendium is generated from portable Markdown canon and editorial story scenes. Follow links, explore related entries, or search the archive.",
+            "Este Compendium reúne el canon en Markdown y las escenas narrativas. Sigue los enlaces, explora fichas relacionadas o busca en el archivo.",
+          )}{" "}
         </p>
       </section>
       <section className="directory">
-        <h2>Browse the archive</h2>
+        <h2>{t("Browse the archive", "Explorar el archivo")}</h2>
         <div className="type-list">
           {types.map((type) => {
-            const first = site.entities.find((entity) => entity.type === type);
             return (
-              <button
-                key={type}
-                type="button"
-                onClick={() => first && navigate(first.route)}
-              >
+              <button key={type} type="button" onClick={() => openIndex(type)}>
                 <span>{type}</span>
                 <strong>
                   {
@@ -90,10 +102,10 @@ export function CoverPage({
       </section>
       {site.warnings.length > 0 ? (
         <section className="warnings">
-          <h2>Warnings</h2>
+          <h2>{t("Warnings", "Avisos")}</h2>
           <ul>
             {site.warnings.map((warning) => (
-              <li key={warning}>{warning}</li>
+              <li key={warning}>{diagnosticText(warning)}</li>
             ))}
           </ul>
         </section>

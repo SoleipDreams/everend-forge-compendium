@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import { getSiteData } from "../../src/lib/node/site-data";
 import { siteAssetPath, sitePath } from "../../src/lib/site-links";
+import { isDarkTheme, themeForPreset } from "../../src/themes";
 
 const data = getSiteData();
 const baseUrl = data.config.site?.baseUrl;
@@ -26,7 +27,7 @@ const searchEntries = [
     <link rel="icon" type="image/png" href={sitePath("/favicon.png", baseUrl)} />
     <title>{title}</title>
   </head>
-  <body style={`--accent:${data.config.theme?.accentColor ?? "#C89B3C"}`}>
+  <body data-theme={isDarkTheme(themeForPreset(data.config.theme?.preset)) ? "dark" : "light"} style={`--accent:${data.config.theme?.accentColor ?? "#7cc7a2"}`}>
     <header class="topbar">
       <a class="brand" href={sitePath("/", baseUrl)}><img class="brand-icon" src={brandImage} alt="" width="28" height="28" />{data.title}</a>
       <nav aria-label="Primary navigation"><a href={sitePath("/", baseUrl)}>Universe</a><a href={sitePath("/stories/", baseUrl)}>Stories</a></nav>

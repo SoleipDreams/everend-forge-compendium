@@ -1,3 +1,5 @@
+import { useCompendiumText } from "./compendiumPresentation";
+import { useApplicationActive } from "../applicationActivity";
 import { useEffect, useMemo, useRef } from "react";
 import {
   forceCollide,
@@ -25,10 +27,8 @@ type GraphLink = SimulationLinkDatum<GraphNode> & {
   kind: "wikilink" | "story";
 };
 
-function cssVar(name: string, fallback: string) {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
+function cssVar(element: Element, name: string, fallback: string) {
+  const value = getComputedStyle(element).getPropertyValue(name).trim();
   return value || fallback;
 }
 
@@ -86,6 +86,11 @@ export function GraphView({
   site: SiteData;
   navigate: ReaderNavigation;
 }) {
+  const t = useCompendiumText();
+  const active = useApplicationActive();
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  const activity = useRef<{ resume: () => void; suspend: () => void } | undefined>(undefined);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graph = useMemo(() => buildGraph(site), [site]);
@@ -104,17 +109,28 @@ export function GraphView({
     let lastPointer = { x: 0, y: 0 };
     let moved = false;
 
-    const accent = cssVar("--cp-accent", "#C89B3C");
-    const graphPalette = [
-      accent,
-      cssVar("--cp-link", accent),
-      cssVar("--cp-warning", accent),
-      cssVar("--cp-danger", accent),
-      cssVar("--cp-muted", accent),
-    ];
-    const textColor = cssVar("--cp-text", "#f7f2e8");
-    const mutedColor = cssVar("--cp-muted", "#8fa4b3");
-    const surface = cssVar("--cp-bg", "#03121d");
+    // Compendium's palette belongs to its app root, including when embedded
+    // alongside other apps. Theme changes repaint without resetting pan/zoom.
+    const themeRoot = container.closest(".forge-compendium") ?? container;
+    let accent = "";
+    let graphPalette: string[] = [];
+    let textColor = "";
+    let mutedColor = "";
+    let surface = "";
+    function refreshTheme() {
+      accent = cssVar(themeRoot, "--cp-accent", "#C89B3C");
+      graphPalette = [
+        accent,
+        cssVar(themeRoot, "--cp-link", accent),
+        cssVar(themeRoot, "--cp-warning", accent),
+        cssVar(themeRoot, "--cp-danger", accent),
+        cssVar(themeRoot, "--cp-muted", accent),
+      ];
+      textColor = cssVar(themeRoot, "--cp-text", "#f7f2e8");
+      mutedColor = cssVar(themeRoot, "--cp-muted", "#8fa4b3");
+      surface = cssVar(themeRoot, "--cp-bg", "#03121d");
+    }
+    refreshTheme();
 
     const { nodes, links } = graph;
 
@@ -130,6 +146,7 @@ export function GraphView({
     const radius = (node: GraphNode) => 5 + Math.min(9, node.degree * 1.4);
 
     function render() {
+      if (!activeRef.current) return;
       if (!context || !canvas) return;
       context.save();
       context.scale(devicePixelRatio, devicePixelRatio);
@@ -262,12 +279,33 @@ export function GraphView({
     canvas.addEventListener("pointerup", handlePointerUp);
     canvas.addEventListener("wheel", handleWheel, { passive: false });
     const observer = new ResizeObserver(resize);
-    observer.observe(container);
-    resize();
-
-    return () => {
+    const themeObserver = new MutationObserver(() => {
+      refreshTheme();
+      render();
+    });
+    const suspend = () => {
       simulation.stop();
       observer.disconnect();
+      themeObserver.disconnect();
+    };
+    const resume = () => {
+      refreshTheme();
+      resize();
+      observer.observe(container);
+      const options = { attributes: true, attributeFilter: ["data-theme"] };
+      themeObserver.observe(document.documentElement, options);
+      if (themeRoot !== document.documentElement) themeObserver.observe(themeRoot, options);
+      if (simulation.alpha() > simulation.alphaMin()) simulation.restart();
+    };
+    const lifecycle = { resume, suspend };
+    activity.current = lifecycle;
+    if (activeRef.current) resume(); else suspend();
+
+    return () => {
+      if (activity.current === lifecycle) activity.current = undefined;
+      simulation.stop();
+      observer.disconnect();
+      themeObserver.disconnect();
       canvas.removeEventListener("pointerdown", handlePointerDown);
       canvas.removeEventListener("pointermove", handlePointerMove);
       canvas.removeEventListener("pointerup", handlePointerUp);
@@ -275,24 +313,37 @@ export function GraphView({
     };
   }, [graph, navigate]);
 
+  useEffect(() => {
+    if (active) activity.current?.resume(); else activity.current?.suspend();
+  }, [active]);
+
   if (graph.nodes.length === 0) {
     return (
       <section className="page-title">
-        <p className="chapter">Graph</p>
-        <h1>No published entities to graph yet.</h1>
+        <p className="chapter">{t("Graph", "Grafo")}</p>
+        <h1>
+          {t(
+            "No published entities to graph yet.",
+            "Todavía no hay fichas publicadas para el grafo.",
+          )}
+        </h1>
       </section>
     );
   }
 
   return (
     <div className="graph-view" ref={containerRef}>
-      <canvas ref={canvasRef} aria-label="Relationship graph" />
+      <canvas
+        ref={canvasRef}
+        aria-label={t("Relationship graph", "Grafo de relaciones")}
+      />
       <div className="graph-legend">
         <span>
           <i className="legend-line solid" /> Wikilink
         </span>
         <span>
-          <i className="legend-line dashed" /> Shared scene
+          <i className="legend-line dashed" />{" "}
+          {t("Shared scene", "Escena compartida")}{" "}
         </span>
       </div>
     </div>

@@ -1,0 +1,248 @@
+.forge-compendium .cp-window-title-controls {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 2px;
+  height: 30px;
+  margin-left: 6px;
+}
+.forge-compendium .cp-window-title-controls button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ef-muted);
+}
+.forge-compendium .cp-window-title-controls button:hover {
+  background: var(--ef-accent-soft);
+  border-color: var(--ef-border);
+  color: var(--ef-text);
+}
+.forge-compendium .cp-window-title-controls .cp-window-close:hover {
+  background: #c42b1c;
+  color: white;
+}
+.forge-compendium .header-actions {
+  align-items: center;
+  flex: 0 0 auto;
+}
+.forge-compendium .home-topbar .brand > div {
+  min-width: 0;
+}
+.forge-compendium .home-topbar .brand :is(h1, p) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.forge-compendium .home-topbar .app-brand-icon {
+  flex: 0 0 30px;
+}
+.forge-compendium .cp-desktop-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 30px;
+  height: 30px;
+}
+.forge-compendium .cp-home-menu-trigger {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ef-muted);
+}
+.forge-compendium .cp-home-menu-trigger.active,
+.forge-compendium .cp-home-menu-trigger:hover {
+  border-color: var(--ef-border);
+  background: var(--ef-accent-soft);
+  color: var(--ef-text);
+}
+.forge-compendium :is(.cp-home-menu-popover, .cp-desktop-menu-submenu) {
+  position: absolute;
+  z-index: 120;
+  display: grid;
+  width: max-content;
+  min-width: 210px;
+  padding: 5px;
+  border: 1px solid var(--ef-border);
+  border-radius: 8px;
+  background: var(--ef-panel);
+  box-shadow: 0 12px 34px #0004;
+  color: var(--ef-text);
+}
+.forge-compendium .cp-home-menu-popover {
+  top: calc(100% + 7px);
+  left: 0;
+}
+.forge-compendium .cp-desktop-menu-group {
+  position: relative;
+}
+.forge-compendium .cp-desktop-menu-submenu {
+  top: -5px;
+  left: calc(100% + 5px);
+  max-height: min(72vh, 640px);
+  overflow: auto;
+}
+.forge-compendium :is(.cp-home-menu-popover, .cp-desktop-menu-submenu) button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 18px;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+}
+.forge-compendium
+  :is(.cp-home-menu-popover, .cp-desktop-menu-submenu)
+  button:is(:hover, :focus-visible, .active) {
+  border-color: var(--ef-border);
+  background: var(--ef-accent-soft);
+}
+.forge-compendium .cp-desktop-menu-submenu button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.forge-compendium .cp-desktop-menu-submenu kbd {
+  font: inherit;
+  font-size: 10px;
+  color: var(--ef-muted);
+}
+.forge-compendium .cp-desktop-menu-separator {
+  height: 1px;
+  margin: 4px 5px;
+  background: var(--ef-border);
+}
+.forge-compendium .cp-startup-shell {
+  height: 100vh;
+  overflow: hidden;
+}
+.forge-compendium .cp-startup-shell .home-topbar {
+  z-index: 10001;
+}
+.forge-compendium .cp-startup-shell .brand-loading {
+  top: 48px;
+}
+.forge-compendium .cp-shared-loading-content {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  min-width: 0;
+  min-height: 0;
+  color: var(--ef-text);
+  text-align: center;
+}
+.forge-compendium .cp-shared-loading-content p {
+  max-width: 520px;
+  overflow-wrap: anywhere;
+}
+.forge-compendium[data-window-chrome="true"]
+  .reader-top-left
+  > .reader-icon-button[title="Application settings"] {
+  display: none;
+}
+
+/* Match the Suite's separate top-right capsule in standalone Tauri. */
+.forge-compendium[data-window-chrome="true"] {
+  --cp-window-controls-width: 108px;
+  --cp-window-controls-reserve: 116px;
+}
+
+.forge-compendium[data-window-chrome="true"]
+  :is(.home-topbar, .reader-top-bar) {
+  box-sizing: border-box;
+  width: calc(100% - 16px - var(--cp-window-controls-reserve));
+  margin-left: 8px;
+  margin-right: 0;
+  padding-right: 6px;
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+}
+
+.forge-compendium[data-window-chrome="true"] .cp-window-title-controls {
+  position: fixed;
+  z-index: 10010;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: var(--cp-window-controls-width);
+  height: 40px;
+  gap: 2px;
+  margin: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+  background: var(--cp-panel);
+}
+
+.forge-compendium[data-window-chrome="true"]
+  .cp-window-title-controls > button {
+  flex: 0 0 30px;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  border-radius: 4px;
+  background: transparent;
+}
+
+@container compendium (max-width: 1100px) {
+  .forge-compendium[data-window-chrome="true"]
+    .reader-top-left
+    > .reader-icon-button {
+    display: none;
+  }
+  .forge-compendium[data-window-chrome="true"]
+    .reader-top-right
+    > .reader-icon-button:not(.has-warning) {
+    display: none;
+  }
+  .forge-compendium[data-window-chrome="true"] .reader-nav {
+    flex: 0 1 192px;
+    min-width: 120px;
+  }
+  .forge-compendium[data-window-chrome="true"]
+    .reader-nav
+    > :is(button, .graphs-menu) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .forge-compendium[data-window-chrome="true"] .reader-nav button {
+    width: 100%;
+    padding-inline: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+}
+@container compendium (max-width: 900px) {
+  .forge-compendium[data-window-chrome="true"] .reader-top-bar {
+    gap: 4px;
+  }
+  .forge-compendium[data-window-chrome="true"] .reader-top-left,
+  .forge-compendium[data-window-chrome="true"] .reader-top-right {
+    gap: 4px;
+  }
+  .forge-compendium[data-window-chrome="true"] .reader-top-right .search {
+    width: 100px;
+    flex-basis: 100px;
+  }
+}

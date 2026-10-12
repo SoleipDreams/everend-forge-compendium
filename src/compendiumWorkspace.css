@@ -1,0 +1,523 @@
+.forge-compendium .cp-workspace {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.forge-compendium .cp-explorer {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+}
+.forge-compendium .cp-explorer-rail {
+  width: 38px;
+  flex: 0 0 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+.forge-compendium .cp-explorer-rail button {
+  width: 32px;
+  height: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ef-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+.forge-compendium .cp-explorer-rail button[aria-pressed="true"] {
+  color: var(--ef-accent);
+  background: var(--ef-accent-soft);
+}
+.forge-compendium .cp-explorer-panel {
+  flex: 1;
+  width: var(--cp-explorer-width);
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--ef-border);
+}
+.forge-compendium .cp-explorer-panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--ef-border);
+}
+.forge-compendium .cp-explorer-panel > header button {
+  display: grid;
+  place-items: center;
+  padding: 5px;
+  border: 0;
+  background: transparent;
+  color: var(--ef-muted);
+}
+.forge-compendium .cp-explorer-scroll {
+  overflow: auto;
+  padding: 12px;
+  min-height: 0;
+  flex: 1;
+  scrollbar-gutter: stable;
+}
+.forge-compendium .cp-index-group {
+  margin: 0 0 8px;
+}
+.forge-compendium .cp-index-heading {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 4px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ef-border);
+  text-align: left;
+  color: var(--ef-muted);
+}
+.forge-compendium .cp-index-heading strong {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.forge-compendium .cp-index-heading small {
+  border-radius: 4px;
+  padding: 2px 5px;
+  background: var(--ef-panel-soft);
+}
+.forge-compendium .cp-index-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 7px 8px;
+  min-height: 32px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ef-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.forge-compendium .cp-index-link:hover {
+  background: var(--ef-panel-soft);
+}
+.forge-compendium .cp-index-link[aria-current="page"] {
+  border-color: var(--ef-accent);
+  background: var(--ef-accent-soft);
+}
+.forge-compendium .cp-index-group .cp-index-group {
+  margin-left: 8px;
+}
+.forge-compendium .cp-workspace.overlay .cp-explorer-panel {
+  position: absolute;
+  left: 38px;
+  top: -1px;
+  bottom: -1px;
+  z-index: 45;
+  width: min(var(--cp-explorer-width), calc(100cqw - 72px));
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+  box-shadow: 0 12px 32px #0004;
+}
+.forge-compendium .cp-explorer-resize {
+  position: absolute;
+  right: -3px;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  min-width: 6px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: col-resize;
+  z-index: 46;
+}
+.forge-compendium .cp-workspace-main {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.forge-compendium .cp-workspace-main .compendium-reading-surface {
+  height: 100%;
+  min-height: 0;
+}
+.forge-compendium .cp-workspace-main .reader-shell {
+  height: 100%;
+  min-height: 0;
+  display: block;
+  overflow: hidden;
+}
+.forge-compendium .cp-workspace-main .reader-main {
+  height: 100%;
+  overflow: auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+.forge-compendium .cp-workspace-main .reader-shell.full-bleed .reader-main {
+  padding: 12px;
+}
+.forge-compendium .cp-workspace-main .publication-workspace {
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.forge-compendium .entry-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 16px;
+  align-items: start;
+}
+.forge-compendium .entry {
+  max-width: 860px;
+  padding: 24px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+}
+.forge-compendium .entry-cover-image {
+  border-radius: 8px;
+}
+.forge-compendium .entry h1 {
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.forge-compendium .related {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.forge-compendium .related > section {
+  padding: 16px;
+  margin: 0;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+}
+.forge-compendium .cover {
+  min-height: 240px;
+  padding: 32px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.forge-compendium .intro {
+  padding: 24px 0;
+  border: 0;
+  background: transparent;
+}
+.forge-compendium :is(.story-card, .sequence, .event-content, .timeline-item) {
+  border-radius: 8px;
+}
+.forge-compendium .cp-content-group {
+  border: 0;
+  border-bottom: 1px solid var(--ef-border);
+  margin: 8px 0;
+}
+.forge-compendium .cp-content-group > summary {
+  padding: 10px 4px;
+  cursor: pointer;
+  color: var(--ef-muted);
+  font: 600 13px var(--ef-ui-font);
+}
+.forge-compendium .cp-content-group > div {
+  padding: 8px 4px 16px;
+}
+.forge-compendium
+  :is(
+    .publication-manager,
+    .settings-panel,
+    .correction-panel,
+    .diagnostics-drawer
+  ) {
+  border-radius: 12px;
+}
+.forge-compendium .publication-manager {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  min-width: 0;
+}
+.forge-compendium .publication-manager-header {
+  padding: 0 0 12px;
+  margin: 0;
+}
+.forge-compendium .publication-manager-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.forge-compendium .publication-profile-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.forge-compendium .publication-profile-strip > div {
+  min-width: 0;
+}
+.forge-compendium .publication-profile-strip button {
+  border-radius: 8px;
+  padding: 10px;
+}
+.forge-compendium .publication-manager-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: start;
+}
+.forge-compendium .publication-manager-fields > label {
+  flex: 1;
+  min-width: 160px;
+}
+.forge-compendium .publication-manager-fields > .cp-content-group {
+  flex: 1 1 100%;
+}
+.forge-compendium
+  :is(
+    .publication-picker-section,
+    .publication-warning-list,
+    .publication-summary
+  ) {
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+  padding: 12px;
+}
+.forge-compendium .publication-picker-row {
+  min-height: 36px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ef-border);
+  background: transparent;
+}
+.forge-compendium .publication-picker-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.forge-compendium .publication-picker-toolbar > :is(label, select) {
+  min-width: 0;
+  flex: 1 1 150px;
+}
+.forge-compendium .publication-footer-actions {
+  padding: 12px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.forge-compendium .cp-unsaved-dialog {
+  position: fixed;
+  z-index: 300;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #0006;
+}
+.forge-compendium .cp-unsaved-dialog > section {
+  width: min(440px, 100%);
+  padding: 24px;
+  border: 1px solid var(--ef-border);
+  border-radius: 12px;
+  background: var(--ef-panel);
+  color: var(--ef-text);
+}
+.forge-compendium .cp-unsaved-dialog footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.forge-compendium .search-results {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 100px);
+  overflow: auto;
+  border-radius: 10px;
+  background: var(--ef-panel);
+  z-index: 100;
+}
+.forge-compendium .search-results button[aria-selected="true"] {
+  background: var(--ef-accent-soft);
+  color: var(--ef-accent);
+}
+.forge-compendium .cp-empty {
+  color: var(--ef-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 8px;
+}
+.forge-compendium .home-panel {
+  padding: 24px;
+}
+.forge-compendium .recent-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.forge-compendium :is(.recent-list > li, .active-universe-card) {
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+}
+@container compendium (max-width:1100px) {
+  .forge-compendium .entry-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .forge-compendium .related {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .forge-compendium .publication-picker-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@container compendium (max-width:900px) {
+  .forge-compendium .reader-top-right .search {
+    flex: 1 1 120px;
+    width: 120px;
+  }
+  .forge-compendium .reader-main {
+    padding: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .forge-compendium .cp-workspace :is(button, summary) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.forge-compendium .cp-workspace-main .reader-main {
+  border: 0;
+  background: transparent;
+}
+.forge-compendium .cp-workspace-main {
+  container: compendium-content / inline-size;
+}
+.forge-compendium .home-panel {
+  width: min(100% - 32px, 1040px);
+  margin-inline: auto;
+  overflow: auto;
+}
+.forge-compendium .recent-list button {
+  padding: 16px;
+  min-height: 90px;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+}
+.forge-compendium .recent-list button span {
+  overflow-wrap: anywhere;
+}
+.forge-compendium :is(.story-list > article, .sequence, .page-title) {
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: var(--ef-panel);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.forge-compendium .page-title h1 {
+  margin-block: 8px;
+}
+.forge-compendium
+  :is(
+    .settings-dialog,
+    .correction-dialog,
+    .feedback-modal,
+    .diagnostics-drawer
+  ) {
+  border: 1px solid var(--ef-border);
+  background: var(--ef-panel);
+  border-radius: 12px;
+}
+.forge-compendium .cp-explorer {
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+@container compendium-content (max-width:800px) {
+  .forge-compendium .entry-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .forge-compendium .related {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .forge-compendium .publication-picker-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.forge-compendium
+  .cp-workspace
+  :is(
+    .cp-explorer-scroll,
+    .reader-main,
+    .publication-workspace,
+    .publication-picker-list
+  ) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ef-muted) transparent;
+}
+.forge-compendium
+  :is(.publication-manager-actions, .publication-footer-actions)
+  button {
+  padding: 6px 12px;
+  border: 1px solid var(--ef-border);
+  background: var(--ef-panel-soft);
+  color: var(--ef-text);
+}
+.forge-compendium .publication-manager-actions .primary-action {
+  color: var(--ef-accent);
+  background: var(--ef-accent-soft);
+  border-color: var(--ef-accent);
+}
+.forge-compendium .cp-technical-id {
+  margin: 4px 0;
+  font-size: 11px;
+  color: var(--ef-muted);
+}
+.forge-compendium .cp-technical-id summary {
+  font-size: 11px;
+  cursor: pointer;
+}
+.forge-compendium .cp-technical-id code {
+  display: block;
+  overflow-wrap: anywhere;
+  margin: 4px 0;
+}
+
+.forge-compendium .compendium-shell .reader-universe-button {
+  max-width: 240px;
+}
+.forge-compendium[data-window-chrome="true"]
+  .cp-standalone
+  .reader-top-right
+  > .reader-icon-button:not(.has-warning) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+@container compendium (max-width:720px) {
+  .forge-compendium .compendium-shell .reader-universe-button {
+    max-width: 120px;
+  }
+}

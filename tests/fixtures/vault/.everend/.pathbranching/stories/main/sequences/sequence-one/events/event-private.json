@@ -1,0 +1,33 @@
+{
+  "storageVersion": "0.2",
+  "event": {
+    "id": "event:private",
+    "name": "Keeper's secret chamber",
+    "text": {
+      "format": "plain",
+      "content": "GM PRIVATE: the keeper hid the original map here."
+    },
+    "canonRefs": [],
+    "decisions": [
+      {
+        "id": "decision:secret-room",
+        "outcomes": [
+          {
+            "id": "outcome:secret-door",
+            "name": "Open the GM-only door",
+            "availability": [
+              { "type": "hasVariable", "variableId": "private:door-key" }
+            ]
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "id": "route:gm-only",
+        "from": "outcome:event:private:decision:secret-room:outcome:secret-door",
+        "to": "event:gm-only"
+      }
+    ]
+  }
+}

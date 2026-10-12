@@ -1,3 +1,4 @@
+import { useCompendiumText } from "./compendiumPresentation";
 import { useMemo } from "react";
 import type { Entity, SiteData } from "../types";
 import type { ReaderNavigation } from "./Reader";
@@ -38,16 +39,23 @@ export function TimelineView({
   site: SiteData;
   navigate: ReaderNavigation;
 }) {
+  const t = useCompendiumText();
   const entries = useMemo(() => timelineEntries(site), [site]);
 
   if (entries.length === 0) {
     return (
       <section className="page-title">
-        <p className="chapter">Timeline</p>
-        <h1>No dated entries yet.</h1>
+        <p className="chapter">{t("Timeline", "Cronología")}</p>
+        <h1>
+          {t("No dated entries yet.", "Todavía no hay fichas con fecha.")}
+        </h1>
         <p>
-          Add a <code>date:</code> (or <code>start:</code> / <code>end:</code>)
-          field to an entity's frontmatter to place it on the timeline.
+          {t("Add a", "Añade un campo")} <code>date:</code> {t("(or", "(o")}{" "}
+          <code>start:</code> / <code>end:</code>
+          {t(
+            ") field to an entity's frontmatter to place it on the timeline.",
+            ") al frontmatter de una ficha para incluirla en la cronología.",
+          )}{" "}
         </p>
       </section>
     );
@@ -57,9 +65,14 @@ export function TimelineView({
   return (
     <>
       <section className="page-title">
-        <p className="chapter">Chronology</p>
-        <h1>Timeline</h1>
-        <p>Every dated entry of the universe, in canonical order.</p>
+        <p className="chapter">{t("Chronology", "Cronología")}</p>
+        <h1>{t("Timeline", "Cronología")}</h1>
+        <p>
+          {t(
+            "Every dated entry of the universe, in canonical order.",
+            "Todas las fichas fechadas del universo, en orden canónico.",
+          )}
+        </p>
       </section>
       <ol className="timeline">
         {entries.map(({ entity, label, sortValue }) => {

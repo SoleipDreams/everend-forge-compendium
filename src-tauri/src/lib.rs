@@ -3,6 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::UNIX_EPOCH;
+#[cfg(target_os = "macos")]
 use tauri::menu::{
     Menu, MenuItem, PredefinedMenuItem, Submenu, HELP_SUBMENU_ID, WINDOW_SUBMENU_ID,
 };
@@ -35,6 +36,7 @@ struct VaultReadResult {
     errors: Vec<VaultReadError>,
 }
 
+#[cfg(target_os = "macos")]
 fn menu_item(
     app: &tauri::AppHandle,
     id: &str,
@@ -44,6 +46,7 @@ fn menu_item(
     MenuItem::with_id(app, id, label, true, accelerator)
 }
 
+#[cfg(target_os = "macos")]
 fn build_app_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let file_menu = Submenu::with_items(
         app,
@@ -375,8 +378,10 @@ fn delete_universe_file(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .menu(build_app_menu)
+    let builder = tauri::Builder::default();
+    #[cfg(target_os = "macos")]
+    let builder = builder.menu(build_app_menu);
+    builder
         .on_menu_event(|app, event| {
             let id = event.id().as_ref();
             if id.starts_with("cp:") {

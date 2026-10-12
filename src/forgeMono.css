@@ -1,0 +1,283 @@
+/* Forge blue ink, warm paper and restrained gold. Only color changes: existing typography, geometry and motion remain authoritative. Persisted theme IDs stay compatible with earlier settings. */
+:root[data-theme="forge-mono-light"] .forge-compendium {
+  color-scheme: light;
+  --ef-bg: #f5ecd9;
+  --ef-panel: #fff8e9;
+  --ef-panel-soft: #eadfc7;
+  --ef-border: #c7b594;
+  --ef-text: #282317;
+  --ef-muted: #655b48;
+  --ef-faint: #776952;
+  --ef-accent: #87531e;
+  --ef-accent-soft: #ead8b1;
+  --ef-accent-contrast: #fff8e9;
+  --ef-blue: #365c87;
+  --ef-steel: #58677c;
+  --ef-success: #316346;
+  --ef-danger: #9b3e32;
+}
+
+:root[data-theme="forge-mono-dark"] .forge-compendium {
+  color-scheme: dark;
+  --ef-bg: #0a0b10;
+  --ef-panel: #12141b;
+  --ef-panel-soft: #1a1d27;
+  --ef-border: #30333f;
+  --ef-text: #efe9dd;
+  --ef-muted: #a8a296;
+  --ef-faint: #8c877e;
+  --ef-accent: #f2c46d;
+  --ef-accent-soft: #282219;
+  --ef-accent-contrast: #201609;
+  --ef-blue: #7fb0ff;
+  --ef-steel: #b4bdcc;
+  --ef-success: #91c7a6;
+  --ef-danger: #efa697;
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium {
+  --wn-bg: var(--ef-bg);
+  --wn-panel: var(--ef-panel);
+  --wn-panel-2: var(--ef-panel-soft);
+  --wn-card: var(--ef-panel);
+  --wn-border: var(--ef-border);
+  --wn-text: var(--ef-text);
+  --wn-muted: var(--ef-muted);
+  --wn-accent: var(--ef-accent);
+  --wn-editor-bg: var(--ef-panel);
+  --wn-editor-text: var(--ef-text);
+  --cp-bg: var(--ef-bg);
+  --cp-panel: var(--ef-panel);
+  --cp-panel-2: var(--ef-panel-soft);
+  --cp-surface: var(--ef-panel);
+  --cp-text: var(--ef-text);
+  --cp-muted: var(--ef-muted);
+  --cp-heading: var(--ef-text);
+  --cp-border: var(--ef-border);
+  --cp-border-soft: var(--ef-border);
+  --cp-reading-bg: var(--ef-panel);
+  --cp-reading-text: var(--ef-text);
+  --cp-link: var(--ef-blue);
+  --cp-accent: var(--ef-accent);
+  --cp-warning: var(--ef-accent);
+  --cp-danger: var(--ef-danger);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(.home-shell, .publication-workspace, .brand-loading) {
+  background: var(--ef-bg);
+  color: var(--ef-text);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .eyebrow,
+    .dialog-kicker,
+    .toc-title,
+    .publication-workspace-heading .chapter,
+    .publication-badge,
+    .publication-profile-badge,
+    .publication-draft-status,
+    .settings-nav-group > p
+  ) {
+  color: var(--ef-faint);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .active-universe-card,
+    .recent-list button,
+    .publication-summary > div,
+    .publication-picker-section,
+    .cover
+  ) {
+  border-color: color-mix(in srgb, var(--ef-accent) 22%, var(--ef-border));
+  background: var(--ef-panel);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .settings-dialog,
+    .correction-dialog,
+    .feedback-modal-dialog,
+    .reader-view-options-content,
+    .forge-orbit-panel,
+    .reader-options-content,
+    .diagnostics-drawer,
+    .publication-manager,
+    .toc,
+    .reader-main,
+    .related
+  ) {
+  border-color: var(--ef-border);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(input, select, textarea) {
+  border-color: var(--ef-border);
+  accent-color: var(--ef-accent);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  button:not(:disabled):hover {
+  border-color: var(--ef-accent);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .primary-action {
+  border-color: var(--ef-accent);
+  background: var(--ef-accent);
+  color: var(--ef-accent-contrast);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .primary-action:not(:disabled):is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--ef-accent) 88%, var(--ef-panel));
+  color: var(--ef-accent-contrast);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(button, summary, input, select, textarea, a):focus-visible {
+  outline-color: var(--ef-accent);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .reader-nav button.active,
+    .toc li button.active,
+    .settings-dialog-nav button.active,
+    .publication-profile-strip button.active
+  ) {
+  color: var(--ef-text);
+  background: var(--ef-accent-soft);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(.mode-switch, .publication-mode-switch)
+  button.active {
+  background: var(--ef-accent);
+  color: var(--ef-accent-contrast);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(.feedback-modal-frame-error, .feedback-modal-frame-wrap) {
+  color: var(--ef-text);
+  border-color: var(--ef-border);
+  background: var(--ef-panel-soft);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .publication-badge-status,
+    .publication-badge-dependency,
+    .publication-badge-excluded,
+    .publication-badge-warning
+  ) {
+  background: color-mix(in srgb, currentColor 10%, var(--ef-panel));
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .publication-badge-status {
+  color: var(--ef-success);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .publication-badge-dependency {
+  color: var(--ef-blue);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .publication-badge-excluded {
+  color: var(--ef-danger);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .publication-badge-warning {
+  color: var(--ef-accent);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .publication-warning-list {
+  color: var(--ef-text);
+  border-color: color-mix(in srgb, var(--ef-danger) 50%, var(--ef-border));
+  background: color-mix(in srgb, var(--ef-danger) 8%, var(--ef-panel));
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(.toc-title, .reader-top-bar .brand p, .publication-profile-badge) {
+  color: var(--ef-steel);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .publication-warning-list strong,
+    .feedback-modal-frame-error span,
+    .brand-loading-content > p,
+    .brand-loading-status
+  ) {
+  color: var(--ef-muted);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(.dialog-backdrop, .feedback-modal-backdrop) {
+  background: #0009;
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(.brand-loading::before, .brand-loading::after, .brand-loading-orbit) {
+  border-color: var(--ef-border);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  :is(
+    .brand-loading-orbit::after,
+    .brand-loading-pulse,
+    .brand-loading-mark-glow
+  ) {
+  background: var(--ef-accent);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .map-pin-label {
+  background: var(--ef-panel);
+  color: var(--ef-text);
+  border-color: var(--ef-border);
+}
+
+:root:is([data-theme="forge-mono-light"], [data-theme="forge-mono-dark"])
+  .forge-compendium
+  .map-pin-dot {
+  border-color: var(--ef-panel);
+}
+
+:root[data-theme="forge-mono-dark"] .forge-compendium .forge-logo-on-light {
+  display: none;
+}
+:root[data-theme="forge-mono-dark"] .forge-compendium .forge-logo-on-dark {
+  display: block;
+}

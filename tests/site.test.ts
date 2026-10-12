@@ -38,6 +38,91 @@ describe("Compendium source projection", () => {
     expect(site.stories[1].sequences[0].events[0].name).toBe("Legacy scene");
   });
 
+  it("projects safe route choices and diagnoses conditional or broken routes", () => {
+    const site = loadSite(fixture);
+    const event = site.stories[0].sequences[0].events.find(
+      (item) => item.id === "event:arrival",
+    )!;
+    expect(event.choices).toEqual([
+      {
+        id: "route:gate",
+        label: "Open the northern gate",
+        targetEventId: "event:departure",
+        targetRoute: "/stories/main/event-departure/",
+        destinationName: "Beyond the northern gate",
+      },
+      {
+        id: "route:room",
+        label: "Inspect the flooded room",
+        targetEventId: "event:private",
+        targetRoute: "/stories/main/event-private/",
+        destinationName: "Keeper's secret chamber",
+      },
+    ]);
+    expect(site.warnings.join(" ")).toContain("Conditional narrative options");
+    expect(site.warnings.join(" ")).toContain("unavailable destination");
+    expect(JSON.stringify(event)).not.toContain("private:keeper-key");
+    expect(JSON.stringify(event)).not.toContain("Use the keeper's hidden key");
+  });
+
+  it("removes choices to excluded events and keeps private text out of the edition", () => {
+    const indexed = loadIndexedUniverse(fixture);
+    const profile: PublicationProfile = {
+      profileVersion: 1,
+      id: "players",
+      name: "Players",
+      rules: { statuses: [] },
+      selection: {
+        entityIds: { include: [], exclude: [] },
+        storyIds: { include: ["main"], exclude: [] },
+        sequenceIds: { include: ["sequence:one"], exclude: [] },
+        eventIds: {
+          include: ["event:arrival", "event:departure"],
+          exclude: ["event:private"],
+        },
+      },
+      dependencyPolicy: "include-marked",
+    };
+    const preview = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    );
+    const event = preview.stories[0].sequences[0].events.find(
+      (item) => item.id === "event:arrival",
+    )!;
+    expect(event.choices?.map((choice) => choice.targetEventId)).toEqual([
+      "event:departure",
+    ]);
+    expect(JSON.stringify(preview)).not.toContain("GM PRIVATE");
+    expect(JSON.stringify(preview)).not.toContain("Keeper's secret chamber");
+    expect(JSON.stringify(preview)).not.toContain("Open the GM-only door");
+    expect(JSON.stringify(preview)).not.toContain("event:gm-only");
+    expect(
+      preview.publicationManifest?.warnings
+        .map((item) => item.message)
+        .join(" "),
+    ).toContain("destination is not included");
+    const baselineFingerprint = preview.publicationManifest?.sourceFingerprint;
+    const privateEvent = indexed.stories
+      .flatMap((story) =>
+        story.sequences.flatMap((sequence) => sequence.events),
+      )
+      .find((item) => item.id === "event:private")!;
+    privateEvent.name = "An edited hidden scene name";
+    privateEvent.text = "GM PRIVATE: a new secret detail.";
+    const afterPrivateEdit = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    );
+    expect(afterPrivateEdit.publicationManifest?.sourceFingerprint).toBe(
+      baselineFingerprint,
+    );
+  });
+
   it("projects PathBranching event cover assets without executable state", () => {
     const site = loadSite(fixture);
     const event = site.stories[0].sequences[0].events[0];
@@ -83,14 +168,21 @@ describe("Compendium source projection", () => {
       },
       dependencyPolicy: "include-marked",
     };
-    const preview = projectIndexedUniverse(indexed, "preview", profile, sanitizeNode);
+    const preview = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    );
     const all = projectIndexedUniverse(indexed, "all", profile, sanitizeNode);
     expect(preview.entities.map((entity) => entity.id)).toEqual([
       "character:aster",
       "character:mira",
       "location:northwatch",
     ]);
-    expect(all.entities.map((entity) => entity.id)).toEqual(indexed.entities.map((entity) => entity.id));
+    expect(all.entities.map((entity) => entity.id)).toEqual(
+      indexed.entities.map((entity) => entity.id),
+    );
     expect(all.publicationManifest).toBeUndefined();
     expect(preview.publicationManifest?.mode).toBe("preview");
   });
@@ -103,14 +195,22 @@ describe("Compendium source projection", () => {
       name: "Manual",
       rules: { statuses: [] },
       selection: {
-        entityIds: { include: ["character:aster"], exclude: ["character:mira"] },
+        entityIds: {
+          include: ["character:aster"],
+          exclude: ["character:mira"],
+        },
         storyIds: { include: [], exclude: [] },
         sequenceIds: { include: [], exclude: [] },
         eventIds: { include: [], exclude: [] },
       },
       dependencyPolicy: "include-marked",
     };
-    const preview = projectIndexedUniverse(indexed, "preview", profile, sanitizeNode);
+    const preview = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    );
     expect(preview.entities.map((entity) => entity.id)).toEqual([
       "character:aster",
       "location:northwatch",
@@ -118,7 +218,11 @@ describe("Compendium source projection", () => {
     expect(preview.publicationManifest?.included.dependencyEntityIds).toEqual([
       "location:northwatch",
     ]);
-    expect(preview.warnings.some((warning) => warning.includes("Excluded dependency character:mira"))).toBe(true);
+    expect(
+      preview.warnings.some((warning) =>
+        warning.includes("Excluded dependency character:mira"),
+      ),
+    ).toBe(true);
   });
 
   it("preserves the minimal story structure for event-level selection", () => {
@@ -136,10 +240,17 @@ describe("Compendium source projection", () => {
       },
       dependencyPolicy: "include-marked",
     };
-    const preview = projectIndexedUniverse(indexed, "preview", profile, sanitizeNode);
+    const preview = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    );
     expect(preview.stories).toHaveLength(1);
     expect(preview.stories[0].sequences).toHaveLength(1);
-    expect(preview.stories[0].sequences[0].events.map((event) => event.id)).toEqual(["event:arrival"]);
+    expect(
+      preview.stories[0].sequences[0].events.map((event) => event.id),
+    ).toEqual(["event:arrival"]);
     expect(preview.entities.map((entity) => entity.id)).toEqual([
       "character:aster",
       "character:mira",
@@ -162,10 +273,22 @@ describe("Compendium source projection", () => {
       },
       dependencyPolicy: "include-marked" as const,
     } satisfies PublicationProfile;
-    const first = projectIndexedUniverse(indexed, "preview", profile, sanitizeNode).publicationManifest;
-    const second = projectIndexedUniverse(indexed, "preview", profile, sanitizeNode).publicationManifest;
+    const first = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    ).publicationManifest;
+    const second = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    ).publicationManifest;
     expect(first).toEqual(second);
-    expect(first?.included.entityIds).toEqual([...first?.included.entityIds ?? []].sort());
+    expect(first?.included.entityIds).toEqual(
+      [...(first?.included.entityIds ?? [])].sort(),
+    );
   });
 
   it("treats narrative exclusions as filters over the default story set", () => {
@@ -183,7 +306,12 @@ describe("Compendium source projection", () => {
       },
       dependencyPolicy: "include-marked",
     };
-    const preview = projectIndexedUniverse(indexed, "preview", profile, sanitizeNode);
+    const preview = projectIndexedUniverse(
+      indexed,
+      "preview",
+      profile,
+      sanitizeNode,
+    );
     expect(preview.stories.map((story) => story.id)).toEqual(["legacy"]);
   });
 });

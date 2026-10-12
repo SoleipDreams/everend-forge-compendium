@@ -32,7 +32,7 @@ function parseUniverseProfile(
 
   try {
     const parsed = JSON.parse(profileFile.content) as UniverseProfile | null;
-    if (!parsed || typeof parsed !== "object") return undefined;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return undefined;
     const icon: UniverseIcon | undefined =
       parsed.icon?.type && parsed.icon.value
         ? {
@@ -41,6 +41,7 @@ function parseUniverseProfile(
           }
         : undefined;
     return {
+      ...parsed,
       name:
         typeof parsed.name === "string" && parsed.name.trim()
           ? parsed.name.trim()

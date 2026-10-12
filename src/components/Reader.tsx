@@ -1,102 +1,19 @@
-import { useMemo } from "react";
+import { useCompendiumText } from "./compendiumPresentation";
 import type { Entity, SiteData } from "../types";
 import { BookComingSoon } from "./BookComingSoon";
 import { CoverPage } from "./CoverPage";
 import { EntryPage } from "./EntryPage";
 import { EventPage } from "./EventPage";
 import { GraphView } from "./GraphView";
-import { mapDefinitions, MapsView } from "./MapsView";
+import { MapsView } from "./MapsView";
 import { StoriesIndex } from "./StoriesIndex";
 import { StoryPage } from "./StoryPage";
 import { TimelineView } from "./TimelineView";
+import { useSurfaceMotion } from "../useSurfaceMotion";
 
 export type ReaderMode = "web" | "book";
 
 export type ReaderNavigation = (route: string) => void;
-
-export function orderedTypes(site: SiteData) {
-  const order = site.config.navigation?.typeOrder ?? [];
-  return [...new Set(site.entities.map((entity) => entity.type))].sort(
-    (a, b) => {
-      return (
-        (order.indexOf(a) + 1 || 999) - (order.indexOf(b) + 1 || 999) ||
-        a.localeCompare(b)
-      );
-    },
-  );
-}
-
-function TocSidebar({
-  site,
-  route,
-  navigate,
-}: {
-  site: SiteData;
-  route: string;
-  navigate: ReaderNavigation;
-}) {
-  const types = useMemo(() => orderedTypes(site), [site]);
-  const hasMaps = useMemo(() => mapDefinitions(site).length > 0, [site]);
-  return (
-    <aside className="toc" aria-label="Table of contents">
-      <p className="toc-title">Table of Contents</p>
-      {types.map((type) => (
-        <section key={type}>
-          <h2>{type}</h2>
-          <ul>
-            {site.entities
-              .filter((entity) => entity.type === type)
-              .map((entity) => (
-                <li key={entity.id}>
-                  <button
-                    type="button"
-                    className={route === entity.route ? "active" : ""}
-                    onClick={() => navigate(entity.route)}
-                  >
-                    {entity.name}
-                  </button>
-                </li>
-              ))}
-          </ul>
-        </section>
-      ))}
-      {site.stories.length > 0 ? (
-        <section>
-          <h2>Stories</h2>
-          <ul>
-            {site.stories.map((story) => (
-              <li key={story.id}>
-                <button
-                  type="button"
-                  className={route === story.route ? "active" : ""}
-                  onClick={() => navigate(story.route)}
-                >
-                  {story.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-      {hasMaps ? (
-        <section>
-          <h2>Maps</h2>
-          <ul>
-            <li>
-              <button
-                type="button"
-                className={route === "/maps/" ? "active" : ""}
-                onClick={() => navigate("/maps/")}
-              >
-                Atlas
-              </button>
-            </li>
-          </ul>
-        </section>
-      ) : null}
-    </aside>
-  );
-}
 
 function findEntity(site: SiteData, route: string): Entity | undefined {
   return site.entities.find((entity) => entity.route === route);
@@ -117,6 +34,8 @@ export function Reader({
   refresh: () => void;
   onSuggestCorrection?: (entity: Entity) => void;
 }) {
+  const t = useCompendiumText();
+  const contentRef = useSurfaceMotion<HTMLDivElement>(`${mode}:${route}`);
   if (mode === "book") {
     return <BookComingSoon />;
   }
@@ -167,14 +86,21 @@ export function Reader({
         } else {
           content = (
             <section className="page-title">
-              <p className="chapter">Not found</p>
-              <h1>This page is not part of the published Compendium.</h1>
+              <p className="chapter">
+                {t("Not found", "Página no encontrada")}
+              </p>
+              <h1>
+                {t(
+                  "This page is not part of the published Compendium.",
+                  "Esta página no forma parte del Compendium publicado.",
+                )}
+              </h1>
               <button
                 type="button"
                 className="primary-action"
                 onClick={refresh}
               >
-                Reload universe
+                {t("Reload universe", "Recargar universo")}{" "}
               </button>
             </section>
           );
@@ -186,10 +112,9 @@ export function Reader({
   const fullBleed = route === "/graph/" || route === "/maps/";
   return (
     <div className={`reader-shell ${fullBleed ? "full-bleed" : ""}`}>
-      {!fullBleed ? (
-        <TocSidebar site={site} route={route} navigate={navigate} />
-      ) : null}
-      <div className="reader-main">{content}</div>
+      <div ref={contentRef} className="reader-main">
+        {content}
+      </div>
     </div>
   );
 }

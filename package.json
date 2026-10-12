@@ -12,6 +12,9 @@
     "dev": "vite",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
+    "tauri:debug": "pwsh -NoProfile -File scripts/tauri-debug.ps1",
+    "pw": "playwright-cli -s=compendium",
+    "pw:attach": "playwright-cli -s=compendium attach --cdp=http://127.0.0.1:9225",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
@@ -43,6 +46,7 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
+    "@playwright/cli": "0.1.22",
     "@tauri-apps/cli": "^2",
     "@types/d3-force": "^3.0.10",
     "@types/node": "^24.0.0",

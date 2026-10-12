@@ -5,6 +5,8 @@ dist-check/
 dist-review-check/
 .astro/
 coverage/
+output/playwright/
+.playwright-cli/
 .DS_Store
 
 # Tauri build artifacts

@@ -1,3 +1,4 @@
+import { useCompendiumText } from "./compendiumPresentation";
 import { PencilLine } from "lucide-react";
 import type { Entity, SiteData } from "../types";
 import { EntryBody } from "./EntryBody";
@@ -15,6 +16,7 @@ export function EntryPage({
   navigate: ReaderNavigation;
   onSuggestCorrection?: (entity: Entity) => void;
 }) {
+  const t = useCompendiumText();
   const related = entity.backlinks
     .map((id) => site.entities.find((candidate) => candidate.id === id))
     .filter((value): value is Entity => Boolean(value));
@@ -46,7 +48,8 @@ export function EntryPage({
                 className="suggest-correction-button"
                 onClick={() => onSuggestCorrection(entity)}
               >
-                <PencilLine size={14} /> Suggest correction
+                <PencilLine size={14} />{" "}
+                {t("Suggest correction", "Sugerir corrección")}{" "}
               </button>
             ) : null}
           </div>
@@ -55,7 +58,7 @@ export function EntryPage({
               <VaultAssetImage
                 path={entity.presentation.portrait}
                 vaultPath={site.vaultPath}
-                alt={`${entity.name} portrait`}
+                alt={t(`${entity.name} portrait`, `Retrato de ${entity.name}`)}
                 className="entry-portrait-image"
               />
             ) : null}
@@ -73,7 +76,7 @@ export function EntryPage({
       </article>
       <aside className="related">
         <section>
-          <h2>Related entries</h2>
+          <h2>{t("Related entries", "Fichas relacionadas")}</h2>
           {related.length ? (
             <ul>
               {related.map((item) => (
@@ -86,11 +89,16 @@ export function EntryPage({
               ))}
             </ul>
           ) : (
-            <p>No published backlinks yet.</p>
+            <p>
+              {t(
+                "No published backlinks yet.",
+                "Todavía no hay enlaces entrantes publicados.",
+              )}
+            </p>
           )}
         </section>
         <section>
-          <h2>Appears in stories</h2>
+          <h2>{t("Appears in stories", "Apariciones en historias")}</h2>
           {appearances.length ? (
             <ul>
               {appearances.map(({ event, story }) => (
@@ -103,7 +111,12 @@ export function EntryPage({
               ))}
             </ul>
           ) : (
-            <p>No published scenes reference this entry.</p>
+            <p>
+              {t(
+                "No published scenes reference this entry.",
+                "Ninguna escena publicada menciona esta ficha.",
+              )}
+            </p>
           )}
         </section>
       </aside>

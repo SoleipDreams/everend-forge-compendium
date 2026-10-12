@@ -1,3 +1,4 @@
+import { useCompendiumText } from "./compendiumPresentation";
 import type { Entity, SiteData, Story, StoryEvent } from "../types";
 import { EntryBody } from "./EntryBody";
 import { VaultAssetImage } from "./VaultAssetImage";
@@ -14,6 +15,7 @@ export function EventPage({
   event: StoryEvent;
   navigate: ReaderNavigation;
 }) {
+  const t = useCompendiumText();
   const refs = event.canonRefs
     .map((id) => site.entities.find((entity) => entity.id === id))
     .filter((value): value is Entity => Boolean(value));
@@ -30,7 +32,10 @@ export function EventPage({
           />
         ) : null}
         {event.images && event.images.length > 1 ? (
-          <div className="event-image-gallery" aria-label="Scene images">
+          <div
+            className="event-image-gallery"
+            aria-label={t("Scene images", "Imágenes de la escena")}
+          >
             {event.images.slice(1).map((path) => (
               <VaultAssetImage
                 key={path}
@@ -54,10 +59,32 @@ export function EventPage({
             navigate={navigate}
           />
         ) : null}
+        {event.choices?.length ? (
+          <nav
+            className="narrative-choice-list"
+            aria-label={t("Narrative choices", "Opciones narrativas")}
+          >
+            <h2>{t("Choose a route", "Elige una ruta")}</h2>
+            <div>
+              {event.choices.map((choice) => (
+                <button
+                  type="button"
+                  key={choice.id}
+                  onClick={() => navigate(choice.targetRoute)}
+                >
+                  <strong>{choice.label}</strong>
+                  <span>
+                    {t("Continue to", "Continuar hacia")} {choice.destinationName}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </nav>
+        ) : null}
       </article>
       <aside className="related">
         <section>
-          <h2>Canon references</h2>
+          <h2>{t("Canon references", "Referencias al canon")}</h2>
           {refs.length ? (
             <ul>
               {refs.map((entity) => (
@@ -70,7 +97,12 @@ export function EventPage({
               ))}
             </ul>
           ) : (
-            <p>No canon references in this scene.</p>
+            <p>
+              {t(
+                "No canon references in this scene.",
+                "Esta escena no tiene referencias al canon.",
+              )}
+            </p>
           )}
         </section>
       </aside>

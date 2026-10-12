@@ -365,7 +365,7 @@ function warnUnknownNarrativeSelections(
 }
 
 function warnRouteCollisions(
-  indexed: IndexedUniverse,
+  indexed: Pick<IndexedUniverse, "entities" | "stories">,
   warnings: PublicationFinding[],
 ) {
   const routes = new Map<string, string>();
@@ -388,17 +388,38 @@ function warnRouteCollisions(
   });
 }
 
+function safeSourceWarning(message: string) {
+  if (message.includes("Conditional narrative options"))
+    return "Conditional narrative options were omitted because Compendium does not evaluate story rules.";
+  if (message.includes("narrative option"))
+    return "A narrative option points to an unavailable destination and was omitted.";
+  if (message.includes("PathBranching story"))
+    return "A PathBranching story source could not be read.";
+  if (message.includes("sequence"))
+    return "A PathBranching sequence source could not be read.";
+  if (message.includes("frontmatter"))
+    return "An entity source is missing required metadata.";
+  if (message.includes("duplicate entity id"))
+    return "Entity sources contain a duplicate identifier.";
+  if (message.includes("manifest entry"))
+    return "A PathBranching story manifest entry was invalid.";
+  return "A source diagnostic is available in local All mode.";
+}
+
 export function projectIndexedUniverse(
   indexed: IndexedUniverse,
   mode: PublicationMode,
   profile: PublicationProfile,
   sanitize: Sanitizer,
 ): SiteData {
-  const warnings: PublicationFinding[] = indexed.warnings.map((message) =>
+  const sourceWarnings =
+    mode === "preview"
+      ? [...new Set(indexed.warnings.map(safeSourceWarning))]
+      : indexed.warnings;
+  const warnings: PublicationFinding[] = sourceWarnings.map((message) =>
     finding(message),
   );
   warnUnknownNarrativeSelections(indexed, profile, warnings);
-  warnRouteCollisions(indexed, warnings);
   const includedEntityIds = new Set<string>();
   const dependencyEntityIds = new Set<string>();
   const reasons: Record<string, "status" | "manual" | "dependency"> = {};
@@ -487,6 +508,7 @@ export function projectIndexedUniverse(
     indexed.assetPaths,
     sanitize,
   );
+  const selectedEventIds = new Set(parts.eventIds);
   const stories = indexed.stories
     .filter((story) => (mode === "all" ? true : parts.storyIds.has(story.id)))
     .map((story) => ({
@@ -497,13 +519,31 @@ export function projectIndexedUniverse(
         )
         .map((sequence) => ({
           ...sequence,
-          events: sequence.events.filter((event) =>
-            mode === "all" ? true : parts.eventIds.has(event.id),
-          ),
+          events: sequence.events
+            .filter((event) =>
+              mode === "all" ? true : parts.eventIds.has(event.id),
+            )
+            .map((event) => {
+              const choices = (event.choices ?? []).filter((choice) => {
+                const included =
+                  mode === "all" || selectedEventIds.has(choice.targetEventId);
+                if (!included) {
+                  warnings.push(
+                    finding(
+                      `A narrative option from "${event.name}" was omitted because its destination is not included in this publication.`,
+                      event.id,
+                    ),
+                  );
+                }
+                return included;
+              });
+              return { ...event, choices };
+            }),
         }))
         .filter((sequence) => sequence.events.length > 0),
     }))
     .filter((story) => story.sequences.length > 0);
+  warnRouteCollisions({ entities, stories }, warnings);
   const resolveLink = entityLinkResolver(entities);
   stories.forEach((story) =>
     story.sequences.forEach((sequence) =>
@@ -547,8 +587,8 @@ export function projectIndexedUniverse(
           sourceFingerprint: hashText(
             JSON.stringify({
               config: indexed.config,
-              entities: indexed.entities,
-              stories: indexed.stories,
+              entities,
+              stories,
             }),
           ),
         }

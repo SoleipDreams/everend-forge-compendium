@@ -3,6 +3,6 @@
   "sequence": {
     "id": "sequence:one",
     "name": "Aster's Route",
-    "eventIds": ["event:arrival"]
+    "eventIds": ["event:arrival", "event:departure", "event:private"]
   }
 }
