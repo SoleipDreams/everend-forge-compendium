@@ -1563,8 +1563,7 @@ publication={site ? () => setShowPublication(true) : undefined}
           ) : null}
         </div>
 
-        <div hidden={!showSettings && !suiteChrome?.settingsHost}>
-          <SettingsDialog
+        <SettingsDialog
             visible={showSettings}
             active={suiteChrome?.active}
             section={settingsSection}
@@ -1663,7 +1662,6 @@ publication={site ? () => setShowPublication(true) : undefined}
               </div>
             }
           />
-        </div>
 
         <CompendiumWorkspace
           site={site}
