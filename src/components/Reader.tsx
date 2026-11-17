@@ -1,15 +1,19 @@
 import { useCompendiumText } from "./compendiumPresentation";
+import { lazy, Suspense } from "react";
 import type { Entity, SiteData } from "../types";
 import { BookComingSoon } from "./BookComingSoon";
 import { CoverPage } from "./CoverPage";
 import { EntryPage } from "./EntryPage";
 import { EventPage } from "./EventPage";
-import { GraphView } from "./GraphView";
 import { MapsView } from "./MapsView";
 import { StoriesIndex } from "./StoriesIndex";
 import { StoryPage } from "./StoryPage";
 import { TimelineView } from "./TimelineView";
 import { useSurfaceMotion } from "../useSurfaceMotion";
+
+const GraphView = lazy(() =>
+  import("./GraphView").then((module) => ({ default: module.GraphView })),
+);
 
 export type ReaderMode = "web" | "book";
 
@@ -46,7 +50,17 @@ export function Reader({
   } else if (route === "/stories/") {
     content = <StoriesIndex site={site} navigate={navigate} />;
   } else if (route === "/graph/") {
-    content = <GraphView site={site} navigate={navigate} />;
+    content = (
+      <Suspense
+        fallback={
+          <section className="page-title" role="status" aria-busy="true">
+            <h1>{t("Preparing the world graph…", "Preparando el grafo del mundo…")}</h1>
+          </section>
+        }
+      >
+        <GraphView site={site} navigate={navigate} />
+      </Suspense>
+    );
   } else if (route === "/timeline/") {
     content = <TimelineView site={site} navigate={navigate} />;
   } else if (route === "/maps/") {

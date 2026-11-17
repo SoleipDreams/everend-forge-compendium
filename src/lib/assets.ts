@@ -25,35 +25,49 @@ export function resolveVaultAssetPath(
   notePath: string | undefined,
   rawPath: string,
 ) {
-  const trimmed = rawPath.trim();
-  if (!trimmed || isExternalAssetPath(trimmed)) return undefined;
-  let decoded = trimmed;
-  try {
-    decoded = decodeURI(trimmed);
-  } catch {
-    // Keep the original value when a malformed escape is present.
-  }
-  if (!isSafeVaultPath(decoded)) return undefined;
+  return createVaultAssetPathResolver(assetPaths)(notePath, rawPath);
+}
 
-  const known = new Set(assetPaths.map(normalizeAssetPath));
-  const normalized = normalizeAssetPath(decoded);
-  const candidates = [
-    normalized,
-    notePath && dirname(notePath)
-      ? `${dirname(notePath)}/${normalized}`
-      : undefined,
-  ].filter((value): value is string => Boolean(value));
-  const exact = candidates.find((candidate) => known.has(candidate));
-  if (exact) return exact;
-
-  const basename = normalized.split("/").pop();
-  if (basename) {
-    const fallback = [...known].find(
-      (candidate) => candidate.split("/").pop() === basename,
-    );
-    if (fallback) return fallback;
+/** Builds an asset resolver once for repeated lookups against the same vault. */
+export function createVaultAssetPathResolver(assetPaths: string[]) {
+  const known = new Set<string>();
+  const firstByBasename = new Map<string, string>();
+  for (const assetPath of assetPaths) {
+    const normalized = normalizeAssetPath(assetPath);
+    known.add(normalized);
+    const basename = normalized.split("/").pop();
+    if (basename && !firstByBasename.has(basename))
+      firstByBasename.set(basename, normalized);
   }
-  return normalized;
+
+  return (notePath: string | undefined, rawPath: string) => {
+    const trimmed = rawPath.trim();
+    if (!trimmed || isExternalAssetPath(trimmed)) return undefined;
+    let decoded = trimmed;
+    try {
+      decoded = decodeURI(trimmed);
+    } catch {
+      // Keep the original value when a malformed escape is present.
+    }
+    if (!isSafeVaultPath(decoded)) return undefined;
+
+    const normalized = normalizeAssetPath(decoded);
+    const candidates = [
+      normalized,
+      notePath && dirname(notePath)
+        ? `${dirname(notePath)}/${normalized}`
+        : undefined,
+    ].filter((value): value is string => Boolean(value));
+    const exact = candidates.find((candidate) => known.has(candidate));
+    if (exact) return exact;
+
+    const basename = normalized.split("/").pop();
+    if (basename) {
+      const fallback = firstByBasename.get(basename);
+      if (fallback) return fallback;
+    }
+    return normalized;
+  };
 }
 
 type JsonRecord = Record<string, unknown>;
@@ -105,33 +119,55 @@ export function presentationFromProperties(
   assetPaths: string[],
   notePath: string,
 ) {
-  if (!propertiesContent) return undefined;
+  return createPresentationResolver(propertiesContent, assetPaths)(
+    entityType,
+    frontmatter,
+    notePath,
+  );
+}
+
+/** Prepares presentation metadata and asset lookups for a batch of entities. */
+export function createPresentationResolver(
+  propertiesContent: string | undefined,
+  assetPaths: string[],
+) {
+  if (!propertiesContent) return () => undefined;
   try {
     const config = JSON.parse(propertiesContent) as JsonRecord;
     const types = record(config.entityTypes);
     const definitions = Array.isArray(types?.definitions)
       ? types.definitions
       : [];
-    const type = definitions
-      .map(record)
-      .find((candidate) => candidate?.id === entityType);
-    const presentation = record(type?.presentation);
-    if (!presentation) return undefined;
-    const paths = propertyDefinitions(config);
-    const result: { portrait?: string; cover?: string } = {};
-    for (const role of ["portrait", "cover"] as const) {
-      const propertyId = presentation[`${role}PropertyId`];
-      if (typeof propertyId !== "string") continue;
-      const raw = valueAtPath(
-        frontmatter,
-        paths.get(propertyId) ?? [propertyId],
-      );
-      if (typeof raw !== "string" || !raw.trim()) continue;
-      const resolved = resolveVaultAssetPath(assetPaths, notePath, raw);
-      if (resolved) result[role] = resolved;
+    const presentationByType = new Map<string, JsonRecord | undefined>();
+    for (const value of definitions) {
+      const type = record(value);
+      if (typeof type?.id === "string" && !presentationByType.has(type.id))
+        presentationByType.set(type.id, record(type.presentation));
     }
-    return result.portrait || result.cover ? result : undefined;
+    const paths = propertyDefinitions(config);
+    const resolveAssetPath = createVaultAssetPathResolver(assetPaths);
+    return (
+      entityType: string,
+      frontmatter: JsonRecord,
+      notePath: string,
+    ) => {
+      const presentation = presentationByType.get(entityType);
+      if (!presentation) return undefined;
+      const result: { portrait?: string; cover?: string } = {};
+      for (const role of ["portrait", "cover"] as const) {
+        const propertyId = presentation[`${role}PropertyId`];
+        if (typeof propertyId !== "string") continue;
+        const raw = valueAtPath(
+          frontmatter,
+          paths.get(propertyId) ?? [propertyId],
+        );
+        if (typeof raw !== "string" || !raw.trim()) continue;
+        const resolved = resolveAssetPath(notePath, raw);
+        if (resolved) result[role] = resolved;
+      }
+      return result.portrait || result.cover ? result : undefined;
+    };
   } catch {
-    return undefined;
+    return () => undefined;
   }
 }

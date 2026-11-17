@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import type { IndexedUniverse, PublicationMode, PublicationProfile, SiteData } from "../../types.js";
 import { assembleIndexedUniverse } from "../assemble.js";
-import { resolveVaultAssetPath } from "../assets.js";
+import { createVaultAssetPathResolver } from "../assets.js";
 import { CONFIG_RELATIVE_PATH } from "../config.js";
 import { findMarkdownAssets } from "../markdown.js";
 import { isSafeVaultPath } from "../paths.js";
@@ -58,6 +58,7 @@ export function createSiteDataFile(data: SiteData) {
 }
 
 export function copyReferencedAssets(data: SiteData, outputPath: string) {
+  const resolveAssetPath = createVaultAssetPathResolver(data.assetPaths);
   const assets = new Set(
     data.publicationManifest?.assets ??
     [
@@ -67,7 +68,7 @@ export function copyReferencedAssets(data: SiteData, outputPath: string) {
         entity.presentation?.portrait,
         entity.presentation?.cover,
         ...findMarkdownAssets(entity.body).map((asset) =>
-          resolveVaultAssetPath(data.assetPaths, entity.path, asset),
+          resolveAssetPath(entity.path, asset),
         ),
       ]),
       ...data.stories.flatMap((story) =>

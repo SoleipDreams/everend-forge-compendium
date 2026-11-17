@@ -1,6 +1,9 @@
 import YAML from "yaml";
 import type { Entity, SourceFile } from "../types.js";
-import { presentationFromProperties, resolveVaultAssetPath } from "./assets.js";
+import {
+  createPresentationResolver,
+  createVaultAssetPathResolver,
+} from "./assets.js";
 import {
   findWikilinks,
   renderMarkdownWith,
@@ -86,12 +89,20 @@ export function discoverEntityStatuses(files: SourceFile[]) {
   return [...statuses].sort((left, right) => left.localeCompare(right));
 }
 
-function readEntities(files: SourceFile[], warnings: string[]): Entity[] {
+function readEntities(
+  files: SourceFile[],
+  warnings: string[],
+  assetPaths: string[],
+): Entity[] {
   const entities: Entity[] = [];
   const propertiesContent = files.find(
     (file) =>
       file.relativePath.replaceAll("\\", "/") === ".everend/properties.json",
   )?.content;
+  const resolvePresentation = createPresentationResolver(
+    propertiesContent,
+    assetPaths,
+  );
   const seenIds = new Set<string>();
   for (const file of files) {
     const relativePath = file.relativePath.replaceAll("\\", "/");
@@ -145,15 +156,7 @@ function readEntities(files: SourceFile[], warnings: string[]): Entity[] {
       map: asOptionalString(parsed.frontmatter.map),
       mapX: asOptionalNumber(parsed.frontmatter.mapX),
       mapY: asOptionalNumber(parsed.frontmatter.mapY),
-      presentation: presentationFromProperties(
-        propertiesContent,
-        type,
-        parsed.frontmatter,
-        files
-          .filter((candidate) => candidate.binary)
-          .map((candidate) => candidate.relativePath.replaceAll("\\", "/")),
-        relativePath,
-      ),
+      presentation: resolvePresentation(type, parsed.frontmatter, relativePath),
     });
   }
 
@@ -181,6 +184,7 @@ function decorateEntities(
   }));
 
   const byKey = new Map<string, Entity>();
+  const resolveAssetPath = createVaultAssetPathResolver(assetPaths);
   entities.forEach((entity) =>
     lookupKeys(entity).forEach((key) => byKey.set(key, entity)),
   );
@@ -203,7 +207,7 @@ function decorateEntities(
           : undefined;
       },
       sanitize,
-      (asset) => resolveVaultAssetPath(assetPaths, entity.path, asset),
+      (asset) => resolveAssetPath(entity.path, asset),
     );
   });
   return entities.sort((left, right) => left.name.localeCompare(right.name));
@@ -214,11 +218,19 @@ export function indexEntities(
   files: SourceFile[],
   warnings: string[],
   sanitize: Sanitizer,
+  assetPaths = collectVaultAssetPaths(files),
 ): Entity[] {
-  const assetPaths = files
+  return decorateEntities(
+    readEntities(files, warnings, assetPaths),
+    assetPaths,
+    sanitize,
+  );
+}
+
+export function collectVaultAssetPaths(files: SourceFile[]) {
+  return files
     .filter((file) => file.binary)
     .map((file) => file.relativePath.replaceAll("\\", "/"));
-  return decorateEntities(readEntities(files, warnings), assetPaths, sanitize);
 }
 
 /** Projects an indexed entity set into the visible publication subset. */

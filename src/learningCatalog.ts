@@ -8,7 +8,7 @@ export const compendiumIntroduction = [
 ];
 export const compendiumLessons: LearningLesson[] = [
   { id: "reading", title: t("Explorar el contenido", "Explore the content"), summary: t("Encuentra una ficha o una historia.", "Find an entry or a story."), section: "reading", steps: [
-    step("read", ["Entra en tu mundo", "Enter your world"], ["Abre una ficha o historia desde el índice de lectura. Puedes volver al índice cuando quieras.", "Open an entry or story from the reading index. You can return to the index at any time."], "reading", "compendium.reader", "content-opened", "brio"),
+    step("read", ["Entra en tu mundo", "Enter your world"], ["Abre una ficha desde Índice o una historia desde Historias. Si no hay fichas publicadas, continúa con una historia; puedes volver al índice cuando quieras.", "Open an entry from Index or a story from Stories. If there are no published entries, continue with a story; you can return to the index at any time."], "reading", "compendium.reader", "content-opened", "brio"),
   ] },
   { id: "profile", title: t("Configurar un perfil", "Configure a profile"), summary: t("Guarda una edición para tu público.", "Save an edition for your audience."), section: "publication", steps: [
     step("save", ["Una edición con nombre", "An edition with a name"], ["En Publicación, crea o modifica un perfil y guárdalo. Puedes conservar los perfiles existentes.", "In Publication, create or edit a profile and save it. You can keep existing profiles."], "publication", "compendium.publication", "profile-saved"),

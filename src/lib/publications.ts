@@ -10,7 +10,7 @@ import type {
   Story,
 } from "../types.js";
 import { findMarkdownAssets, renderMarkdownWith } from "./markdown.js";
-import { resolveVaultAssetPath } from "./assets.js";
+import { createVaultAssetPathResolver } from "./assets.js";
 import {
   entityLinkResolver,
   projectEntities,
@@ -276,6 +276,7 @@ function publicationAssets(
   indexed: IndexedUniverse,
   entities: Entity[],
   stories: Story[],
+  resolveAssetPath: ReturnType<typeof createVaultAssetPathResolver>,
 ) {
   const assets = new Set<string>();
   [indexed.config.site?.coverImage, indexed.config.site?.logo]
@@ -287,7 +288,7 @@ function publicationAssets(
       .forEach((value) => assets.add(value));
     findMarkdownAssets(entity.body)
       .map((asset) =>
-        resolveVaultAssetPath(indexed.assetPaths, entity.path, asset),
+        resolveAssetPath(entity.path, asset),
       )
       .filter((value): value is string => Boolean(value))
       .forEach((value) => assets.add(value));
@@ -300,7 +301,7 @@ function publicationAssets(
           .forEach((value) => assets.add(value));
         findMarkdownAssets(event.text ?? "")
           .map((asset) =>
-            resolveVaultAssetPath(indexed.assetPaths, undefined, asset),
+            resolveAssetPath(undefined, asset),
           )
           .filter((value): value is string => Boolean(value))
           .forEach((value) => assets.add(value));
@@ -545,19 +546,20 @@ export function projectIndexedUniverse(
     .filter((story) => story.sequences.length > 0);
   warnRouteCollisions({ entities, stories }, warnings);
   const resolveLink = entityLinkResolver(entities);
+  const resolveAssetPath = createVaultAssetPathResolver(indexed.assetPaths);
   stories.forEach((story) =>
     story.sequences.forEach((sequence) =>
       sequence.events.forEach((event) => {
         event.html = event.text
           ? renderMarkdownWith(event.text, resolveLink, sanitize, (asset) =>
-              resolveVaultAssetPath(indexed.assetPaths, undefined, asset),
+              resolveAssetPath(undefined, asset),
             )
           : "";
       }),
     ),
   );
 
-  const assets = publicationAssets(indexed, entities, stories);
+  const assets = publicationAssets(indexed, entities, stories, resolveAssetPath);
   const manifest: PublicationManifest | undefined =
     mode === "preview"
       ? {

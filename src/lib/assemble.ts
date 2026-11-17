@@ -11,6 +11,7 @@ import { CONFIG_RELATIVE_PATH, parseConfig } from "./config.js";
 import { type Sanitizer } from "./markdown.js";
 import { projectStories } from "./pathbranching.js";
 import {
+  collectVaultAssetPaths,
   discoverEntityStatuses,
   indexEntities,
 } from "./vault.js";
@@ -76,10 +77,8 @@ export function assembleIndexedUniverse(
   const universeProfile = parseUniverseProfile(files);
   const availableStatuses = discoverEntityStatuses(files);
   const warnings: string[] = [];
-  const assetPaths = files
-    .filter((file) => file.binary)
-    .map((file) => file.relativePath.replaceAll("\\", "/"));
-  const entities = indexEntities(files, warnings, sanitize);
+  const assetPaths = collectVaultAssetPaths(files);
+  const entities = indexEntities(files, warnings, sanitize, assetPaths);
   const stories = projectStories(files, warnings);
 
   const title = config.site?.title ?? vaultBaseName(vaultPath);

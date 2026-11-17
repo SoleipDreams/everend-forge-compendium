@@ -26,9 +26,15 @@ const simulation = vi.hoisted(() => {
     force: vi.fn(),
     on: vi.fn(),
     stop: vi.fn(),
+    alpha: vi.fn(),
+    alphaMin: vi.fn(),
+    restart: vi.fn(),
   };
   value.force.mockReturnValue(value);
   value.on.mockReturnValue(value);
+  value.alpha.mockReturnValue(1);
+  value.alphaMin.mockReturnValue(0.001);
+  value.restart.mockReturnValue(value);
   return value;
 });
 vi.mock("d3-force", () => {
