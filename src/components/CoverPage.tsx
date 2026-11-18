@@ -77,8 +77,8 @@ export function CoverPage({
         </h2>
         <p>
           {t(
-            "This Compendium is generated from portable Markdown canon and editorial story scenes. Follow links, explore related entries, or search the archive.",
-            "Este Compendium reúne el canon en Markdown y las escenas narrativas. Sigue los enlaces, explora fichas relacionadas o busca en el archivo.",
+            "This Compendium is generated from portable Markdown canon and editorial story scenes. Follow links, explore related entities, or search the archive.",
+            "Este Compendium reúne el canon en Markdown y las escenas narrativas. Sigue los enlaces, explora entidades relacionadas o busca en el archivo.",
           )}{" "}
         </p>
       </section>

@@ -324,7 +324,7 @@ export function GraphView({
         <h1>
           {t(
             "No published entities to graph yet.",
-            "Todavía no hay fichas publicadas para el grafo.",
+            "Todavía no hay entidades publicadas para el grafo.",
           )}
         </h1>
       </section>

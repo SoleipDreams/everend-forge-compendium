@@ -47,14 +47,14 @@ export function TimelineView({
       <section className="page-title">
         <p className="chapter">{t("Timeline", "Cronología")}</p>
         <h1>
-          {t("No dated entries yet.", "Todavía no hay fichas con fecha.")}
+          {t("No dated entities yet.", "Todavía no hay entidades con fecha.")}
         </h1>
         <p>
           {t("Add a", "Añade un campo")} <code>date:</code> {t("(or", "(o")}{" "}
           <code>start:</code> / <code>end:</code>
           {t(
             ") field to an entity's frontmatter to place it on the timeline.",
-            ") al frontmatter de una ficha para incluirla en la cronología.",
+            ") al frontmatter de una entidad para incluirla en la cronología.",
           )}{" "}
         </p>
       </section>
@@ -69,8 +69,8 @@ export function TimelineView({
         <h1>{t("Timeline", "Cronología")}</h1>
         <p>
           {t(
-            "Every dated entry of the universe, in canonical order.",
-            "Todas las fichas fechadas del universo, en orden canónico.",
+            "Every dated entity of the universe, in canonical order.",
+            "Todas las entidades fechadas del universo, en orden canónico.",
           )}
         </p>
       </section>

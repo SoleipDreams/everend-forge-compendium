@@ -81,11 +81,11 @@ export function MapsView({
           {t("No maps published yet.", "Todavía no hay mapas publicados.")}
         </h1>
         <p>
-          {t("Create an entity with", "Crea una ficha con")}{" "}
+          {t("Create an entity with", "Crea una entidad con")}{" "}
           <code>type: Map</code>{" "}
           {t(
             "whose body embeds the map image. Other entities can pin themselves with",
-            "e incluye la imagen del mapa en su contenido. Otras fichas pueden situarse mediante",
+            "e incluye la imagen del mapa en su contenido. Otras entidades pueden situarse mediante",
           )}{" "}
           <code>map</code>, <code>mapX</code>
           {t(", and", ", y")} <code>mapY</code>{" "}
@@ -141,7 +141,7 @@ export function MapsView({
               ? imageError || t("Loading map…", "Cargando mapa…")
               : t(
                   "This map entity has no embedded image.",
-                  "Esta ficha de mapa no tiene una imagen incrustada.",
+                  "Esta entidad de mapa no tiene una imagen incrustada.",
                 )}
           </div>
         )}
@@ -151,7 +151,7 @@ export function MapsView({
           {t("Read about", "Leer sobre")} {active.entity.name}
         </button>
         <span>
-          {active.pins.length} {t("pinned entries", "fichas situadas")}
+          {active.pins.length} {t("pinned entities", "entidades situadas")}
         </span>
       </footer>
     </div>

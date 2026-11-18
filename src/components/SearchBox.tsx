@@ -120,7 +120,7 @@ export function SearchBox({
         >
           {!matches.length && (
             <li className="cp-empty" role="presentation">
-              {t("No matching entries.", "No hay resultados.")}
+              {t("No matching entities.", "No hay resultados.")}
             </li>
           )}
           {matches.map((entry, index) => (

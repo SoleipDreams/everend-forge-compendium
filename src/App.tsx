@@ -1310,7 +1310,7 @@ publication={site ? () => setShowPublication(true) : undefined}
                     </span>
                     <strong>{universeDisplayName(site)}</strong>
                     <span>
-                      {site.entities.length} {t("entries", "fichas")} ·{" "}
+                      {site.entities.length} {t("entities", "entidades")} ·{" "}
                       {site.stories.length} {t("stories", "historias")}{" "}
                     </span>
                   </span>
@@ -1785,8 +1785,8 @@ publication={site ? () => setShowPublication(true) : undefined}
                   }
                 >
                   {t(
-                    "Suggest correction to this entry",
-                    "Sugerir corrección de esta ficha",
+                    "Suggest correction to this entity",
+                    "Sugerir corrección de esta entidad",
                   )}{" "}
                 </button>
               </footer>

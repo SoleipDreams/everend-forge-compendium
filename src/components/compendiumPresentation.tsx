@@ -136,15 +136,15 @@ export function formatCompendiumDiagnostic(
     ],
     [
       /^(.+) is missing required entity frontmatter\.$/,
-      "$1 no incluye los metadatos obligatorios de la ficha.",
+      "$1 no incluye los metadatos obligatorios de la entidad.",
     ],
     [
       /^(.+) has duplicate entity id (.+)\.$/,
-      "$1 tiene un ID de ficha duplicado: $2.",
+      "$1 tiene un ID de entidad duplicado: $2.",
     ],
     [
       /^Profile references unknown entity (.+)\.$/,
-      "El perfil hace referencia a una ficha desconocida: $1.",
+      "El perfil hace referencia a una entidad desconocida: $1.",
     ],
     [
       /^Profile references unknown story (.+)\.$/,

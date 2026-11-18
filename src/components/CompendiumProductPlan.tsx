@@ -236,7 +236,7 @@ export function CompendiumProductPlan({ onClose }: { onClose: () => void }) {
                 <span>{t("Publication profile", "Perfil de publicación")}</span>
                 <strong>Lectura pública</strong>
                 <small>
-                  <Check size={12} /> canon · 18 fichas
+                  <Check size={12} /> canon · 18 entidades
                 </small>
               </div>
             </aside>

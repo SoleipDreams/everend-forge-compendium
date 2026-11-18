@@ -314,8 +314,8 @@ export function CompendiumWorkspace({
                 {!site.entities.length && (
                   <p className="cp-empty">
                     {t(
-                      "No entries in this edition.",
-                      "No hay fichas en esta edición.",
+                      "No entities in this edition.",
+                      "No hay entidades en esta edición.",
                     )}
                   </p>
                 )}

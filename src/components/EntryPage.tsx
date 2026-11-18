@@ -76,7 +76,7 @@ export function EntryPage({
       </article>
       <aside className="related">
         <section>
-          <h2>{t("Related entries", "Fichas relacionadas")}</h2>
+          <h2>{t("Related entities", "Entidades relacionadas")}</h2>
           {related.length ? (
             <ul>
               {related.map((item) => (
@@ -113,8 +113,8 @@ export function EntryPage({
           ) : (
             <p>
               {t(
-                "No published scenes reference this entry.",
-                "Ninguna escena publicada menciona esta ficha.",
+                "No published scenes reference this entity.",
+                "Ninguna escena publicada menciona esta entidad.",
               )}
             </p>
           )}

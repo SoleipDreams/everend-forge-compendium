@@ -152,7 +152,7 @@ function Summary({ preview }: { preview: SiteData }) {
     >
       <div>
         <strong>{preview.entities.length}</strong>
-        <span>{t("entities", "fichas")}</span>
+        <span>{t("entities", "entidades")}</span>
       </div>
       <div>
         <strong>{preview.stories.length}</strong>
@@ -583,7 +583,7 @@ export function PublicationManager({
           </label>
           <label>
             <span className="visually-hidden">
-              {t("Entity type", "Tipo de ficha")}
+              {t("Entity type", "Tipo de entidad")}
             </span>
             <select
               value={typeFilter}
@@ -599,7 +599,7 @@ export function PublicationManager({
           </label>
           <label>
             <span className="visually-hidden">
-              {t("Entity folder", "Carpeta de la ficha")}
+              {t("Entity folder", "Carpeta de la entidad")}
             </span>
             <select
               value={folderFilter}
@@ -617,7 +617,7 @@ export function PublicationManager({
           </label>
           <label>
             <span className="visually-hidden">
-              {t("Entity tag", "Etiqueta de la ficha")}
+              {t("Entity tag", "Etiqueta de la entidad")}
             </span>
             <select
               value={tagFilter}
@@ -638,7 +638,7 @@ export function PublicationManager({
         <div className="publication-picker-grid">
           <section className="publication-picker-section">
             <header>
-              <h4>{t("Entities", "Fichas")}</h4>
+              <h4>{t("Entities", "Entidades")}</h4>
               <span>
                 {filteredEntities.length} {t("indexed", "indexados")}
               </span>
@@ -647,8 +647,8 @@ export function PublicationManager({
               {!filteredEntities.length && (
                 <p className="cp-empty">
                   {t(
-                    "No entries match these filters.",
-                    "Ninguna ficha coincide con estos filtros.",
+                    "No entities match these filters.",
+                    "Ninguna entidad coincide con estos filtros.",
                   )}
                 </p>
               )}
