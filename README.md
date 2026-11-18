@@ -4,22 +4,34 @@
 
 <h1 align="center">Everend Compendium</h1>
 <p align="center">
-  The static, publishable reading site for <a href="https://github.com/SoleipDreams/everend-forge">Everend Forge</a> canon.<br />
-  Turns a WorldNotion vault and PathBranching's saved stories into a public compendium.
+  Free, open-source publisher for shareable world encyclopedias and stories.<br />
+  Build a read-only site from WorldNotion canon and PathBranching stories.
+</p>
+
+<p align="center">
+  <a href="README.es.md">Español</a> · <a href="https://github.com/SoleipDreams/everend-forge-compendium/releases/latest">Download free</a> · <a href="https://website-everend-forge.pages.dev/">Explore the integrated Suite</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/SoleipDreams/everend-forge-compendium/actions/workflows/ci.yml"><img src="https://github.com/SoleipDreams/everend-forge-compendium/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
-  <img src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg" alt="License">
+  <a href="https://github.com/SoleipDreams/everend-forge-compendium/releases/latest"><img src="https://img.shields.io/github/v/release/SoleipDreams/everend-forge-compendium?label=latest%20release" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/code-MIT%20OR%20Apache--2.0-blue.svg" alt="Code license"></a>
   <img src="https://img.shields.io/badge/built%20with-Vite%20%2B%20Tauri%20%2B%20TypeScript-1e2a4a.svg" alt="Built with Vite, Tauri, TypeScript">
-  <a href="https://github.com/SoleipDreams/everend-forge"><img src="https://img.shields.io/badge/Everend%20Forge-open%20core%20suite-0a0e1a.svg" alt="Part of Everend Forge"></a>
 </p>
 
-<p align="center"><a href="https://everend-forge-site.pages.dev/#access">Conoce y compra Everend Forge Suite →</a></p>
+<p align="center">Compendium is free to use on its own. The paid Suite is a separate integrated product; buying it does not change this app's open-source rights.</p>
 
 ---
 
 Everend Compendium turns a WorldNotion vault and PathBranching's saved stories into a public static reading site. Canon Markdown remains the source of truth; the Compendium never writes during builds.
+
+```mermaid
+flowchart LR
+  V[WorldNotion vault] --> P[Publication profile]
+  S[PathBranching stories] --> P
+  P --> H[Static HTML site]
+  P --> M[Portable Markdown export]
+```
 
 ## Product direction
 
@@ -75,6 +87,11 @@ npm test
 
 The synthetic fixture under `tests/fixtures/vault` is also the GitHub Pages demo source.
 
+## License
+
+Code is licensed under either MIT or Apache-2.0; documentation is CC BY 4.0. Preserve required legal notices when redistributing. See [license scope](LICENSE), [MIT](LICENSE-MIT), [Apache-2.0](LICENSE-APACHE), [CC BY 4.0](LICENSE-CC-BY-4.0), and the separate [brand policy](TRADEMARKS.md).
+
 ## Support
 
 If Everend Forge is useful to you, you can support its development on [Ko-fi](https://ko-fi.com/heinzdbv).
+
