@@ -90,7 +90,9 @@ export function GraphView({
   const active = useApplicationActive();
   const activeRef = useRef(active);
   activeRef.current = active;
-  const activity = useRef<{ resume: () => void; suspend: () => void } | undefined>(undefined);
+  const activity = useRef<
+    { resume: () => void; suspend: () => void } | undefined
+  >(undefined);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graph = useMemo(() => buildGraph(site), [site]);
@@ -294,12 +296,14 @@ export function GraphView({
       observer.observe(container);
       const options = { attributes: true, attributeFilter: ["data-theme"] };
       themeObserver.observe(document.documentElement, options);
-      if (themeRoot !== document.documentElement) themeObserver.observe(themeRoot, options);
+      if (themeRoot !== document.documentElement)
+        themeObserver.observe(themeRoot, options);
       if (simulation.alpha() > simulation.alphaMin()) simulation.restart();
     };
     const lifecycle = { resume, suspend };
     activity.current = lifecycle;
-    if (activeRef.current) resume(); else suspend();
+    if (activeRef.current) resume();
+    else suspend();
 
     return () => {
       if (activity.current === lifecycle) activity.current = undefined;
@@ -314,7 +318,8 @@ export function GraphView({
   }, [graph, navigate]);
 
   useEffect(() => {
-    if (active) activity.current?.resume(); else activity.current?.suspend();
+    if (active) activity.current?.resume();
+    else activity.current?.suspend();
   }, [active]);
 
   if (graph.nodes.length === 0) {

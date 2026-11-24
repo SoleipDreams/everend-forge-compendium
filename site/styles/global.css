@@ -654,10 +654,13 @@ footer {
   margin: 0 0 12px;
   color: var(--ef-muted);
   font-size: 11px;
-  letter-spacing: .11em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
-.narrative-choice-list > div { display: grid; gap: 8px; }
+.narrative-choice-list > div {
+  display: grid;
+  gap: 8px;
+}
 .narrative-choice-list a {
   display: flex;
   align-items: center;
@@ -670,6 +673,14 @@ footer {
   background: var(--ef-panel-soft);
   text-decoration: none;
 }
-.narrative-choice-list a:hover { border-color: var(--ef-accent); }
-.narrative-choice-list strong { font-size: 14px; }
-.narrative-choice-list span { color: var(--ef-muted); font-size: 12px; text-align: right; }
+.narrative-choice-list a:hover {
+  border-color: var(--ef-accent);
+}
+.narrative-choice-list strong {
+  font-size: 14px;
+}
+.narrative-choice-list span {
+  color: var(--ef-muted);
+  font-size: 12px;
+  text-align: right;
+}

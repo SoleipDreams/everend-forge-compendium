@@ -193,7 +193,8 @@
 }
 
 .forge-compendium[data-window-chrome="true"]
-  .cp-window-title-controls > button {
+  .cp-window-title-controls
+  > button {
   flex: 0 0 30px;
   width: 30px;
   min-width: 30px;

@@ -11,7 +11,10 @@ export function UniverseIconFrame({
   const icon = profile?.icon;
   if (icon?.type === "image" && icon.value) {
     return (
-      <span className="universe-icon-frame" style={{ width: size, height: size }}>
+      <span
+        className="universe-icon-frame"
+        style={{ width: size, height: size }}
+      >
         <img src={icon.value} alt="" />
       </span>
     );

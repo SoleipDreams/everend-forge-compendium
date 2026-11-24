@@ -94,4 +94,3 @@ Code is licensed under either MIT or Apache-2.0; documentation is CC BY 4.0. Pre
 ## Support
 
 If Everend Forge is useful to you, you can support its development on [Ko-fi](https://ko-fi.com/heinzdbv).
-

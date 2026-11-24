@@ -5,4 +5,3 @@ Unless a file or third-party notice says otherwise, application source code is l
 See LICENSE-MIT and LICENSE-APACHE for the source-code licenses and LICENSE-CC-BY-4.0 for documentation and original content. Preserve required copyright and license notices when redistributing.
 
 See TRADEMARKS.md for the separate Everend brand policy.
-

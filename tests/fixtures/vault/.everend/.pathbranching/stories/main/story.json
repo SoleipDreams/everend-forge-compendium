@@ -2,6 +2,13 @@
   "storageVersion": "0.2",
   "storyId": "main",
   "name": "Opening",
-  "assets": [{ "id": "asset:arrival", "name": "Arrival", "path": ".everend/assets/image/arrival.png", "kind": "image" }],
+  "assets": [
+    {
+      "id": "asset:arrival",
+      "name": "Arrival",
+      "path": ".everend/assets/image/arrival.png",
+      "kind": "image"
+    }
+  ],
   "sequenceIds": ["sequence:one"]
 }

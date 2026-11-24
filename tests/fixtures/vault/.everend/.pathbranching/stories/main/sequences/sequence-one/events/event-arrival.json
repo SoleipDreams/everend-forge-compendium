@@ -15,18 +15,50 @@
         "id": "decision:arrival",
         "name": "Choose a way forward",
         "outcomes": [
-          { "id": "outcome:gate", "name": "Open the northern gate", "visibleText": "Open the northern gate" },
-          { "id": "outcome:key", "name": "Use the keeper's key", "visibleText": "Use the keeper's hidden key", "availability": [{ "type": "hasVariable", "variableId": "private:keeper-key" }] },
-          { "id": "outcome:room", "name": "Inspect the flooded room", "visibleText": "Inspect the flooded room" }
+          {
+            "id": "outcome:gate",
+            "name": "Open the northern gate",
+            "visibleText": "Open the northern gate"
+          },
+          {
+            "id": "outcome:key",
+            "name": "Use the keeper's key",
+            "visibleText": "Use the keeper's hidden key",
+            "availability": [
+              { "type": "hasVariable", "variableId": "private:keeper-key" }
+            ]
+          },
+          {
+            "id": "outcome:room",
+            "name": "Inspect the flooded room",
+            "visibleText": "Inspect the flooded room"
+          }
         ]
       },
       { "name": "SECRET DECISION" }
     ],
     "transitions": [
-      { "id": "route:gate", "from": "outcome:event:arrival:decision:arrival:outcome:gate", "to": "event:departure" },
-      { "id": "route:key", "from": "outcome:event:arrival:decision:arrival:outcome:key", "to": "event:private" },
-      { "id": "route:room", "from": "outcome:event:arrival:decision:arrival:outcome:room", "to": "event:private" },
-      { "id": "route:missing", "from": "event:arrival", "to": "event:missing", "label": "Take the hidden tunnel" }
+      {
+        "id": "route:gate",
+        "from": "outcome:event:arrival:decision:arrival:outcome:gate",
+        "to": "event:departure"
+      },
+      {
+        "id": "route:key",
+        "from": "outcome:event:arrival:decision:arrival:outcome:key",
+        "to": "event:private"
+      },
+      {
+        "id": "route:room",
+        "from": "outcome:event:arrival:decision:arrival:outcome:room",
+        "to": "event:private"
+      },
+      {
+        "id": "route:missing",
+        "from": "event:arrival",
+        "to": "event:missing",
+        "label": "Take the hidden tunnel"
+      }
     ],
     "variables": { "hidden": true }
   }

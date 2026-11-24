@@ -1,8 +1,17 @@
 import compendiumIcon from "../assets/everend-compendium-icon.png";
 
-export function BrandLoadingScreen({ message = "Preparing the readable edition…" }: { message?: string }) {
+export function BrandLoadingScreen({
+  message = "Preparing the readable edition…",
+}: {
+  message?: string;
+}) {
   return (
-    <main className="brand-loading brand-loading-compendium" role="status" aria-live="polite" aria-busy="true">
+    <main
+      className="brand-loading brand-loading-compendium"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <div className="brand-loading-orbit" aria-hidden="true" />
       <div className="brand-loading-content">
         <div className="brand-loading-mark" aria-hidden="true">

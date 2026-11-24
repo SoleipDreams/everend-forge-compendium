@@ -3016,4 +3016,6 @@
 }
 
 /* Reader typography is independent of Suite interface preferences. */
-.forge-compendium .reader-shell { font-family: var(--ef-reader-font, var(--ef-primary-font, inherit)); }
+.forge-compendium .reader-shell {
+  font-family: var(--ef-reader-font, var(--ef-primary-font, inherit));
+}

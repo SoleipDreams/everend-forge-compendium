@@ -7,12 +7,12 @@
 
 ## Uso rápido
 
-~~~sh
+```sh
 npm install
 npm run init -- /ruta/a/tu/universo
 npx tsx cli/cli.ts build /ruta/a/tu/universo --out=dist
 npm run site:dev -- /ruta/a/tu/universo
-~~~
+```
 
 Compendium genera una web estática y de solo lectura. El canon Markdown sigue siendo la fuente original; la compilación no escribe cambios en el universo. Los perfiles de publicación determinan qué información se expone.
 

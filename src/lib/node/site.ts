@@ -1,7 +1,12 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { IndexedUniverse, PublicationMode, PublicationProfile, SiteData } from "../../types.js";
+import type {
+  IndexedUniverse,
+  PublicationMode,
+  PublicationProfile,
+  SiteData,
+} from "../../types.js";
 import { assembleIndexedUniverse } from "../assemble.js";
 import { createVaultAssetPathResolver } from "../assets.js";
 import { CONFIG_RELATIVE_PATH } from "../config.js";
@@ -28,12 +33,20 @@ export function loadIndexedUniverse(vaultPathInput: string): IndexedUniverse {
   const vaultPath = path.resolve(vaultPathInput);
   if (!fs.statSync(vaultPath).isDirectory())
     throw new Error(`${vaultPath} is not a vault directory.`);
-  return assembleIndexedUniverse(vaultPath, walkVaultFiles(vaultPath), sanitizeNode);
+  return assembleIndexedUniverse(
+    vaultPath,
+    walkVaultFiles(vaultPath),
+    sanitizeNode,
+  );
 }
 
 export function loadSiteWithOptions(
   vaultPathInput: string,
-  options: { profile?: PublicationProfile; profileId?: string; mode?: PublicationMode } = {},
+  options: {
+    profile?: PublicationProfile;
+    profileId?: string;
+    mode?: PublicationMode;
+  } = {},
 ): SiteData {
   const vaultPath = path.resolve(vaultPathInput);
   if (!fs.statSync(vaultPath).isDirectory())
@@ -41,8 +54,15 @@ export function loadSiteWithOptions(
   const files = walkVaultFiles(vaultPath);
   const indexed = assembleIndexedUniverse(vaultPath, files, sanitizeNode);
   const loaded = loadPublicationProfiles(files, indexed.config);
-  const profile = options.profile ?? profileForId(loaded.profiles, options.profileId, indexed.config);
-  return projectIndexedUniverse(indexed, options.mode ?? "preview", profile, sanitizeNode);
+  const profile =
+    options.profile ??
+    profileForId(loaded.profiles, options.profileId, indexed.config);
+  return projectIndexedUniverse(
+    indexed,
+    options.mode ?? "preview",
+    profile,
+    sanitizeNode,
+  );
 }
 
 export function createSiteDataFile(data: SiteData) {
@@ -61,23 +81,23 @@ export function copyReferencedAssets(data: SiteData, outputPath: string) {
   const resolveAssetPath = createVaultAssetPathResolver(data.assetPaths);
   const assets = new Set(
     data.publicationManifest?.assets ??
-    [
-      data.config.site?.coverImage,
-      data.config.site?.logo,
-      ...data.entities.flatMap((entity) => [
-        entity.presentation?.portrait,
-        entity.presentation?.cover,
-        ...findMarkdownAssets(entity.body).map((asset) =>
-          resolveAssetPath(entity.path, asset),
-        ),
-      ]),
-      ...data.stories.flatMap((story) =>
-        story.sequences.flatMap((sequence) => [
-          ...sequence.events.map((event) => event.coverImage),
-          ...sequence.events.flatMap((event) => event.images ?? []),
+      [
+        data.config.site?.coverImage,
+        data.config.site?.logo,
+        ...data.entities.flatMap((entity) => [
+          entity.presentation?.portrait,
+          entity.presentation?.cover,
+          ...findMarkdownAssets(entity.body).map((asset) =>
+            resolveAssetPath(entity.path, asset),
+          ),
         ]),
-      ),
-    ].filter((value): value is string => Boolean(value)),
+        ...data.stories.flatMap((story) =>
+          story.sequences.flatMap((sequence) => [
+            ...sequence.events.map((event) => event.coverImage),
+            ...sequence.events.flatMap((event) => event.images ?? []),
+          ]),
+        ),
+      ].filter((value): value is string => Boolean(value)),
   );
   for (const asset of assets) {
     if (!isSafeVaultPath(asset))
@@ -87,7 +107,10 @@ export function copyReferencedAssets(data: SiteData, outputPath: string) {
       const message = `Referenced asset was not found: ${asset}`;
       data.warnings.push(message);
       if (data.publicationManifest) {
-        data.publicationManifest.warnings.push({ severity: "warning", message });
+        data.publicationManifest.warnings.push({
+          severity: "warning",
+          message,
+        });
       }
       continue;
     }
@@ -111,14 +134,20 @@ export function applySiteBasePath(data: SiteData) {
   const baseUrl = data.config.site?.baseUrl;
   if (!baseUrl) return data;
   const rewrite = (html: string) =>
-    html.replace(/(href|src)=("|')\/(?!\/)/g, (_full, attribute: string, quote: string) =>
-      `${attribute}=${quote}${sitePath("/", baseUrl).replace(/\/$/, "")}/`,
+    html.replace(
+      /(href|src)=("|')\/(?!\/)/g,
+      (_full, attribute: string, quote: string) =>
+        `${attribute}=${quote}${sitePath("/", baseUrl).replace(/\/$/, "")}/`,
     );
   data.entities.forEach((entity) => {
     entity.html = rewrite(entity.html);
   });
-  data.stories.forEach((story) => story.sequences.forEach((sequence) => sequence.events.forEach((event) => {
-    event.html = rewrite(event.html);
-  })));
+  data.stories.forEach((story) =>
+    story.sequences.forEach((sequence) =>
+      sequence.events.forEach((event) => {
+        event.html = rewrite(event.html);
+      }),
+    ),
+  );
   return data;
 }

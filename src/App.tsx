@@ -1,9 +1,16 @@
-import { mergeUniverseProfile, readUniverseProfileSource } from "./universeProfilePersistence";
+import {
+  mergeUniverseProfile,
+  readUniverseProfileSource,
+} from "./universeProfilePersistence";
 import { ApplicationActivity } from "./applicationActivity";
 import { useSettingsDraft, SettingsDraftBar } from "./SettingsFrame";
 import { useLearningAdapter, useLearningReporter } from "./learning";
 import { compendiumIntroduction, compendiumLessons } from "./learningCatalog";
-import { NotificationProvider, NotificationBell, useNotificationMessage } from "./notifications";
+import {
+  NotificationProvider,
+  NotificationBell,
+  useNotificationMessage,
+} from "./notifications";
 import { formatCompendiumDiagnostic } from "./components/compendiumPresentation";
 import { useCompendiumText } from "./components/compendiumPresentation";
 import { CompendiumWorkspace } from "./components/CompendiumWorkspace";
@@ -153,7 +160,8 @@ function ForgeLogo() {
 
 type AppView = "home" | "reader";
 type LoadState = "idle" | "loading" | "error";
-type SettingsScope = "general" | "app" | "universe" | "about" | "suite" | "update";
+type SettingsScope =
+  "general" | "app" | "universe" | "about" | "suite" | "update";
 
 function universePathName(path: string) {
   return path.split(/[\\/]/).filter(Boolean).pop() ?? path;
@@ -189,15 +197,43 @@ function UniverseProfileEditor({
     icon: site.universeProfile?.icon ?? { type: "preset", value: "book" },
   }));
   const [saving, setSaving] = useState(false);
-  const [savedDraft, setSavedDraft] = useState<UniverseProfile>(() => ({ name: site.universeProfile?.name ?? site.title, icon: site.universeProfile?.icon ?? { type: "preset", value: "book" } }));
+  const [savedDraft, setSavedDraft] = useState<UniverseProfile>(() => ({
+    name: site.universeProfile?.name ?? site.title,
+    icon: site.universeProfile?.icon ?? { type: "preset", value: "book" },
+  }));
   const [saveError, setSaveError] = useState("");
   const baseline = savedDraft;
   const dirty = JSON.stringify(draft) !== JSON.stringify(baseline);
-  const draftRef = useRef(draft); draftRef.current = draft;
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
   const pathRef = useRef(site.vaultPath);
-  const discard = () => { const value = {name:site.universeProfile?.name ?? site.title, icon:site.universeProfile?.icon ?? {type:"preset" as const,value:"book"}}; setDraft(value); setSavedDraft(value); setSaveError(""); };
-  const save = async () => { const snapshot = draftRef.current; setSaving(true); setSaveError(""); try { await onSave(snapshot); setSavedDraft(snapshot); } catch (error) { setSaveError(String(error)); throw error; } finally { setSaving(false); } };
-  const settingsDraft = {dirty, busy:saving, save, discard};
+  const discard = () => {
+    const value = {
+      name: site.universeProfile?.name ?? site.title,
+      icon: site.universeProfile?.icon ?? {
+        type: "preset" as const,
+        value: "book",
+      },
+    };
+    setDraft(value);
+    setSavedDraft(value);
+    setSaveError("");
+  };
+  const save = async () => {
+    const snapshot = draftRef.current;
+    setSaving(true);
+    setSaveError("");
+    try {
+      await onSave(snapshot);
+      setSavedDraft(snapshot);
+    } catch (error) {
+      setSaveError(String(error));
+      throw error;
+    } finally {
+      setSaving(false);
+    }
+  };
+  const settingsDraft = { dirty, busy: saving, save, discard };
   useSettingsDraft("compendium.universe-profile", settingsDraft);
   useUniverseSwitchGuard(
     registerUniverseSwitchGuard,
@@ -276,7 +312,10 @@ function UniverseProfileEditor({
         </div>
 
         {saveError ? <p role="alert">{saveError}</p> : null}
-        <SettingsDraftBar draft={settingsDraft} locale={resolveInterfaceLocale(localePreference)} />
+        <SettingsDraftBar
+          draft={settingsDraft}
+          locale={resolveInterfaceLocale(localePreference)}
+        />
       </div>
     </fieldset>
   );
@@ -326,9 +365,8 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   }, [settings.localePreference, suiteChrome?.suiteSettings?.localePreference]);
   const [view, setView] = useState<AppView>("home");
   const [showProductPlan, setShowProductPlan] = useState(false);
-  const [productPlanView, setProductPlanView] = useState<
-    ComponentType<{ onClose: () => void }>
-  >();
+  const [productPlanView, setProductPlanView] =
+    useState<ComponentType<{ onClose: () => void }>>();
   const ProductPlanView = productPlanView;
   const openProductPlan = async () => {
     if (!import.meta.env.DEV) return;
@@ -347,22 +385,34 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [initialReady, setInitialReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  useNotificationMessage(loadState === "error" ? formatCompendiumDiagnostic(errorMessage, interfaceLocale) : undefined, "error");
+  useNotificationMessage(
+    loadState === "error"
+      ? formatCompendiumDiagnostic(errorMessage, interfaceLocale)
+      : undefined,
+    "error",
+  );
   const [mode, setMode] = useState<ReaderMode>("web");
   const [route, setRoute] = useState("/");
   const [forgeMenuOpen, setForgeMenuOpen] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  useEffect(() => suiteChrome?.registerSettingsOpener?.((section) => {
-    if (section) setSettingsScope(section);
-    setShowSettings(true);
-  }), [suiteChrome?.registerSettingsOpener]);
+  useEffect(
+    () =>
+      suiteChrome?.registerSettingsOpener?.((section) => {
+        if (section) setSettingsScope(section);
+        setShowSettings(true);
+      }),
+    [suiteChrome?.registerSettingsOpener],
+  );
   const [showPublication, setShowPublication] = useState(
     () => settings.explorer?.section === "publication",
   );
   const [settingsScope, setSettingsScope] = useState<SettingsScope>("app");
   const [showDiagnostics, setShowDiagnostics] = useState(false);
-  const reportLearning = useLearningReporter(suiteChrome?.learning, site?.vaultPath);
+  const reportLearning = useLearningReporter(
+    suiteChrome?.learning,
+    site?.vaultPath,
+  );
   const [correctionEntity, setCorrectionEntity] = useState<Entity>();
   const forgeMenuRef = useRef<HTMLDivElement | null>(null);
   const appliedPresetRef = useRef<string | undefined>(undefined);
@@ -529,10 +579,13 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
     }
   });
 
-  const navigate = useCallback((nextRoute: string) => {
-    setRoute(nextRoute);
-    if (nextRoute !== "/") reportLearning("content-opened");
-  }, [reportLearning]);
+  const navigate = useCallback(
+    (nextRoute: string) => {
+      setRoute(nextRoute);
+      if (nextRoute !== "/") reportLearning("content-opened");
+    },
+    [reportLearning],
+  );
 
   const applySite = useCallback((data: SiteData, resetRoute = true) => {
     setSite(data);
@@ -684,7 +737,9 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   const activeThemeIsDark = isDarkTheme(activeTheme);
 
   const effectivePrimaryFont = settings.primaryFont as PrimaryFontId;
-  const setPrimaryFont = useCallback((primaryFont: PrimaryFontId) => { setSettings(current => ({...current, primaryFont})); }, []);
+  const setPrimaryFont = useCallback((primaryFont: PrimaryFontId) => {
+    setSettings((current) => ({ ...current, primaryFont }));
+  }, []);
 
   const setStandaloneStyle = useCallback((theme: ThemeId) => {
     setSettings((current) => ({ ...current, theme }));
@@ -730,20 +785,60 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   useEffect(() => {
     if (!suiteChrome?.settingsHost || !site?.vaultPath) return;
     const root = site.vaultPath;
-    const refresh = (event: Event) => { if ((event as CustomEvent<{path:string}>).detail?.path !== root) return;
-      void readUniverseProfileSource(root).then(source => {
-        const profile = source ? JSON.parse(source) as UniverseProfile : undefined;
-        setSite(current => current?.vaultPath === root ? {...current,universeProfile:profile,title:profile?.name ?? current.config.site?.title ?? universePathName(root)} : current);
-        setIndexedUniverse(current => current?.vaultPath === root ? {...current,universeProfile:profile,title:profile?.name ?? current.config.site?.title ?? universePathName(root)} : current);
-      }).catch(error => console.warn("Could not refresh universe profile.",error));
+    const refresh = (event: Event) => {
+      if ((event as CustomEvent<{ path: string }>).detail?.path !== root)
+        return;
+      void readUniverseProfileSource(root)
+        .then((source) => {
+          const profile = source
+            ? (JSON.parse(source) as UniverseProfile)
+            : undefined;
+          setSite((current) =>
+            current?.vaultPath === root
+              ? {
+                  ...current,
+                  universeProfile: profile,
+                  title:
+                    profile?.name ??
+                    current.config.site?.title ??
+                    universePathName(root),
+                }
+              : current,
+          );
+          setIndexedUniverse((current) =>
+            current?.vaultPath === root
+              ? {
+                  ...current,
+                  universeProfile: profile,
+                  title:
+                    profile?.name ??
+                    current.config.site?.title ??
+                    universePathName(root),
+                }
+              : current,
+          );
+        })
+        .catch((error) =>
+          console.warn("Could not refresh universe profile.", error),
+        );
     };
-    window.addEventListener("everend-forge:profile-saved",refresh); return () => window.removeEventListener("everend-forge:profile-saved",refresh);
+    window.addEventListener("everend-forge:profile-saved", refresh);
+    return () =>
+      window.removeEventListener("everend-forge:profile-saved", refresh);
   }, [suiteChrome?.settingsHost !== undefined, site?.vaultPath]);
   const saveUniverseProfile = useCallback(
     async (profile: UniverseProfile) => {
       if (!site) throw new Error("Open a universe before saving its profile.");
-      if (suiteChrome?.sharedUniversePath && site.vaultPath.replace(/\\/g, "/") !== suiteChrome.sharedUniversePath.replace(/\\/g, "/")) throw new Error("The selected universe is still loading.");
-      const normalizedProfile = mergeUniverseProfile(await readUniverseProfileSource(site.vaultPath), { name: profile.name?.trim() || undefined, icon: profile.icon }) as UniverseProfile;
+      if (
+        suiteChrome?.sharedUniversePath &&
+        site.vaultPath.replace(/\\/g, "/") !==
+          suiteChrome.sharedUniversePath.replace(/\\/g, "/")
+      )
+        throw new Error("The selected universe is still loading.");
+      const normalizedProfile = mergeUniverseProfile(
+        await readUniverseProfileSource(site.vaultPath),
+        { name: profile.name?.trim() || undefined, icon: profile.icon },
+      ) as UniverseProfile;
       const result = await saveUniverseTextFile(
         site.vaultPath,
         ".everend/universe.json",
@@ -757,11 +852,38 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
               "No se pudo guardar el perfil del universo.",
             ),
         );
-      setSite(current => current ? {...current, universeProfile:normalizedProfile, title:normalizedProfile.name ?? current.config.site?.title ?? universePathName(current.vaultPath)} : current);
-      setIndexedUniverse(current => current ? {...current, universeProfile:normalizedProfile, title:normalizedProfile.name ?? current.config.site?.title ?? universePathName(current.vaultPath)} : current);
+      setSite((current) =>
+        current
+          ? {
+              ...current,
+              universeProfile: normalizedProfile,
+              title:
+                normalizedProfile.name ??
+                current.config.site?.title ??
+                universePathName(current.vaultPath),
+            }
+          : current,
+      );
+      setIndexedUniverse((current) =>
+        current
+          ? {
+              ...current,
+              universeProfile: normalizedProfile,
+              title:
+                normalizedProfile.name ??
+                current.config.site?.title ??
+                universePathName(current.vaultPath),
+            }
+          : current,
+      );
       suiteChrome?.settingsHost?.profileSaved(site.vaultPath);
     },
-    [site, interfaceLocale, suiteChrome?.sharedUniversePath, suiteChrome?.settingsHost?.profileSaved],
+    [
+      site,
+      interfaceLocale,
+      suiteChrome?.sharedUniversePath,
+      suiteChrome?.settingsHost?.profileSaved,
+    ],
   );
 
   const savePublicationProfile = useCallback(
@@ -1053,9 +1175,15 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
   );
 
   useLearningAdapter(suiteChrome?.learning, {
-    introduction: compendiumIntroduction, lessons: compendiumLessons,
+    introduction: compendiumIntroduction,
+    lessons: compendiumLessons,
     available: Boolean(site && indexedUniverse && loadState !== "loading"),
-    busy: showSettings || showFeedback, section: showDiagnostics ? "diagnostics" : showPublication ? "publication" : "reading",
+    busy: showSettings || showFeedback,
+    section: showDiagnostics
+      ? "diagnostics"
+      : showPublication
+        ? "publication"
+        : "reading",
     openSection: (section, userInitiated) => {
       if (!site) return;
       setView("reader");
@@ -1208,7 +1336,7 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
               ) : null}
             </div>
           </header>
-          {(showSettings || suiteChrome?.settingsHost) ? (
+          {showSettings || suiteChrome?.settingsHost ? (
             <SettingsDialog
               visible={showSettings}
               active={suiteChrome?.active}
@@ -1227,15 +1355,40 @@ function CompendiumApp({ suiteChrome }: { suiteChrome?: SuiteChrome } = {}) {
                   : setSettings((current) => ({ ...current, localePreference }))
               }
               onOpenDocs={() => void openExternal(COMPENDIUM_DOCS_URL)}
-              appearance={<>
-<TypographySettings
+              appearance={
+                <>
+                  <TypographySettings
                     value={effectivePrimaryFont}
                     onChange={setPrimaryFont}
                   />
-</>}
-generalAppearance={<>{!suiteChrome?.suiteSettings && <label><span>{t("Interface typeface","Fuente de interfaz")}</span><select value={settings.interfaceFont ?? "sans"} onChange={event => setSettings(current => ({...current,interfaceFont:normalizePrimaryFont(event.target.value)}))}><option value="sans">Sans serif</option><option value="serif">Serif</option><option value="humanist">Humanist</option></select></label>}
+                </>
+              }
+              generalAppearance={
+                <>
+                  {!suiteChrome?.suiteSettings && (
+                    <label>
+                      <span>
+                        {t("Interface typeface", "Fuente de interfaz")}
+                      </span>
+                      <select
+                        value={settings.interfaceFont ?? "sans"}
+                        onChange={(event) =>
+                          setSettings((current) => ({
+                            ...current,
+                            interfaceFont: normalizePrimaryFont(
+                              event.target.value,
+                            ),
+                          }))
+                        }
+                      >
+                        <option value="sans">Sans serif</option>
+                        <option value="serif">Serif</option>
+                        <option value="humanist">Humanist</option>
+                      </select>
+                    </label>
+                  )}
 
-<label className="typography-setting">
+                  <label className="typography-setting">
                     <span>{t("Style", "Estilo")}</span>
                     <select
                       value={
@@ -1257,10 +1410,15 @@ generalAppearance={<>{!suiteChrome?.suiteSettings && <label><span>{t("Interface 
                     </select>
                   </label>
 
-<label><span>{t("Theme mode", "Modo del tema")}</span><button type="button" onClick={toggleTheme}>{t("Toggle light / dark", "Cambiar claro / oscuro")}</button></label>
-{ambientBackgroundControl}
+                  <label>
+                    <span>{t("Theme mode", "Modo del tema")}</span>
+                    <button type="button" onClick={toggleTheme}>
+                      {t("Toggle light / dark", "Cambiar claro / oscuro")}
+                    </button>
+                  </label>
+                  {ambientBackgroundControl}
 
-<SceneChoices
+                  <SceneChoices
                     locale={interfaceLocale}
                     scene={
                       suiteChrome?.suiteSettings?.backgroundScene ??
@@ -1277,11 +1435,10 @@ generalAppearance={<>{!suiteChrome?.suiteSettings && <label><span>{t("Interface 
                           }))
                     }
                   />
-
-
-</>}
-settingsHost={suiteChrome?.settingsHost}
-publication={site ? () => setShowPublication(true) : undefined}
+                </>
+              }
+              settingsHost={suiteChrome?.settingsHost}
+              publication={site ? () => setShowPublication(true) : undefined}
               suiteSettings={suiteChrome?.suiteSettings}
             />
           ) : null}
@@ -1388,7 +1545,11 @@ publication={site ? () => setShowPublication(true) : undefined}
         className={`app-shell compendium-shell ${suiteChrome ? "suite-mode" : "cp-standalone"}`}
         style={
           {
-            "--ef-primary-font": primaryFontCssValue((suiteChrome?.suiteSettings?.primaryFont ?? settings.interfaceFont ?? "sans") as PrimaryFontId),
+            "--ef-primary-font": primaryFontCssValue(
+              (suiteChrome?.suiteSettings?.primaryFont ??
+                settings.interfaceFont ??
+                "sans") as PrimaryFontId,
+            ),
             "--ef-reader-font": primaryFontCssValue(effectivePrimaryFont),
           } as CSSProperties
         }
@@ -1519,7 +1680,10 @@ publication={site ? () => setShowPublication(true) : undefined}
             <button
               type="button"
               className={`reader-icon-button ${site.warnings.length ? "has-warning" : ""}`}
-              onClick={() => { setShowDiagnostics(open => !open); if (!showDiagnostics) reportLearning("diagnostics-opened"); }}
+              onClick={() => {
+                setShowDiagnostics((open) => !open);
+                if (!showDiagnostics) reportLearning("diagnostics-opened");
+              }}
               aria-expanded={showDiagnostics}
               aria-label={`${t("Diagnostics", "Diagnóstico")}${site.warnings.length ? ` (${site.warnings.length})` : ""}`}
               title={`${t("Diagnostics", "Diagnóstico")}${site.warnings.length ? ` (${site.warnings.length})` : ""}`}
@@ -1564,104 +1728,132 @@ publication={site ? () => setShowPublication(true) : undefined}
         </div>
 
         <SettingsDialog
-            visible={showSettings}
-            active={suiteChrome?.active}
-            section={settingsSection}
-            onSectionChange={changeSettingsSection}
-            onClose={() => setShowSettings(false)}
-            localePreference={
-              suiteChrome?.suiteSettings?.localePreference ??
-              settings.localePreference
-            }
-            onLocalePreferenceChange={(localePreference) =>
-              suiteChrome?.suiteSettings
-                ? suiteChrome.suiteSettings.onLocalePreferenceChange(
-                    localePreference,
-                  )
-                : setSettings((current) => ({ ...current, localePreference }))
-            }
-            onOpenDocs={() => void openExternal(COMPENDIUM_DOCS_URL)}
-            appearance={<>
-<TypographySettings
-                  value={effectivePrimaryFont}
-                  onChange={setPrimaryFont}
-                />
-</>}
-generalAppearance={<>{!suiteChrome?.suiteSettings && <label><span>{t("Interface typeface","Fuente de interfaz")}</span><select value={settings.interfaceFont ?? "sans"} onChange={event => setSettings(current => ({...current,interfaceFont:normalizePrimaryFont(event.target.value)}))}><option value="sans">Sans serif</option><option value="serif">Serif</option><option value="humanist">Humanist</option></select></label>}
-
-<label className="typography-setting">
-                  <span>{t("Style", "Estilo")}</span>
+          visible={showSettings}
+          active={suiteChrome?.active}
+          section={settingsSection}
+          onSectionChange={changeSettingsSection}
+          onClose={() => setShowSettings(false)}
+          localePreference={
+            suiteChrome?.suiteSettings?.localePreference ??
+            settings.localePreference
+          }
+          onLocalePreferenceChange={(localePreference) =>
+            suiteChrome?.suiteSettings
+              ? suiteChrome.suiteSettings.onLocalePreferenceChange(
+                  localePreference,
+                )
+              : setSettings((current) => ({ ...current, localePreference }))
+          }
+          onOpenDocs={() => void openExternal(COMPENDIUM_DOCS_URL)}
+          appearance={
+            <>
+              <TypographySettings
+                value={effectivePrimaryFont}
+                onChange={setPrimaryFont}
+              />
+            </>
+          }
+          generalAppearance={
+            <>
+              {!suiteChrome?.suiteSettings && (
+                <label>
+                  <span>{t("Interface typeface", "Fuente de interfaz")}</span>
                   <select
-                    value={suiteChrome?.suiteSettings?.style ?? settings.theme}
+                    value={settings.interfaceFont ?? "sans"}
                     onChange={(event) =>
-                      suiteChrome?.suiteSettings
-                        ? suiteChrome.suiteSettings.onStyleChange(
-                            event.target.value,
-                          )
-                        : setStandaloneStyle(event.target.value as ThemeId)
+                      setSettings((current) => ({
+                        ...current,
+                        interfaceFont: normalizePrimaryFont(event.target.value),
+                      }))
                     }
                   >
-                    {THEMES.map((theme) => (
-                      <option key={theme.id} value={theme.id}>
-                        {theme.label}
-                      </option>
-                    ))}
+                    <option value="sans">Sans serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="humanist">Humanist</option>
                   </select>
                 </label>
+              )}
 
-<label><span>{t("Theme mode", "Modo del tema")}</span><button type="button" onClick={toggleTheme}>{t("Toggle light / dark", "Cambiar claro / oscuro")}</button></label>
-{ambientBackgroundControl}
-
-<SceneChoices
-                  locale={interfaceLocale}
-                  scene={
-                    suiteChrome?.suiteSettings?.backgroundScene ??
-                    settings.backgroundScene
-                  }
-                  onScene={(backgroundScene) =>
-                    suiteChrome?.suiteSettings?.onBackgroundSceneChange
-                      ? suiteChrome.suiteSettings.onBackgroundSceneChange(
-                          backgroundScene,
+              <label className="typography-setting">
+                <span>{t("Style", "Estilo")}</span>
+                <select
+                  value={suiteChrome?.suiteSettings?.style ?? settings.theme}
+                  onChange={(event) =>
+                    suiteChrome?.suiteSettings
+                      ? suiteChrome.suiteSettings.onStyleChange(
+                          event.target.value,
                         )
-                      : setSettings((current) => ({
-                          ...current,
-                          backgroundScene,
-                        }))
+                      : setStandaloneStyle(event.target.value as ThemeId)
                   }
-                />
-
-
-</>}
-settingsHost={suiteChrome?.settingsHost}
-publication={site ? () => setShowPublication(true) : undefined}
-            suiteSettings={suiteChrome?.suiteSettings}
-            universe={
-              <div className="universe-settings-summary">
-                <UniverseProfileEditor
-                  site={site}
-                  localePreference={suiteChrome?.suiteSettings?.localePreference ?? settings.localePreference}
-                  onSave={saveUniverseProfile}
-                  registerUniverseSwitchGuard={registerEditorGuard}
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowSettings(false);
-                    setShowPublication(true);
-                  }}
                 >
-                  {t("Open publication workspace", "Abrir Publicación")}{" "}
+                  {THEMES.map((theme) => (
+                    <option key={theme.id} value={theme.id}>
+                      {theme.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                <span>{t("Theme mode", "Modo del tema")}</span>
+                <button type="button" onClick={toggleTheme}>
+                  {t("Toggle light / dark", "Cambiar claro / oscuro")}
                 </button>
-                <small>{site.vaultPath}</small>
-                <button
-                  type="button"
-                  onClick={() => void revealVault(site.vaultPath)}
-                >
-                  {t("Show in Explorer", "Mostrar en el explorador")}{" "}
-                </button>
-              </div>
-            }
-          />
+              </label>
+              {ambientBackgroundControl}
+
+              <SceneChoices
+                locale={interfaceLocale}
+                scene={
+                  suiteChrome?.suiteSettings?.backgroundScene ??
+                  settings.backgroundScene
+                }
+                onScene={(backgroundScene) =>
+                  suiteChrome?.suiteSettings?.onBackgroundSceneChange
+                    ? suiteChrome.suiteSettings.onBackgroundSceneChange(
+                        backgroundScene,
+                      )
+                    : setSettings((current) => ({
+                        ...current,
+                        backgroundScene,
+                      }))
+                }
+              />
+            </>
+          }
+          settingsHost={suiteChrome?.settingsHost}
+          publication={site ? () => setShowPublication(true) : undefined}
+          suiteSettings={suiteChrome?.suiteSettings}
+          universe={
+            <div className="universe-settings-summary">
+              <UniverseProfileEditor
+                site={site}
+                localePreference={
+                  suiteChrome?.suiteSettings?.localePreference ??
+                  settings.localePreference
+                }
+                onSave={saveUniverseProfile}
+                registerUniverseSwitchGuard={registerEditorGuard}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSettings(false);
+                  setShowPublication(true);
+                }}
+              >
+                {t("Open publication workspace", "Abrir Publicación")}{" "}
+              </button>
+              <small>{site.vaultPath}</small>
+              <button
+                type="button"
+                onClick={() => void revealVault(site.vaultPath)}
+              >
+                {t("Show in Explorer", "Mostrar en el explorador")}{" "}
+              </button>
+            </div>
+          }
+        />
 
         <CompendiumWorkspace
           site={site}
@@ -1678,7 +1870,8 @@ publication={site ? () => setShowPublication(true) : undefined}
         >
           {indexedUniverse ? (
             <section
-              data-onboarding-target="compendium.publication" className="publication-workspace"
+              data-onboarding-target="compendium.publication"
+              className="publication-workspace"
               hidden={!showPublication}
               aria-label={t("Publication workspace", "Publicación")}
             >
@@ -1705,14 +1898,15 @@ publication={site ? () => setShowPublication(true) : undefined}
                 onDelete={deletePublicationProfile}
                 onPreview={previewPublicationProfile}
                 registerUniverseSwitchGuard={registerEditorGuard}
-                onLearningAction={event => reportLearning(event)}
+                onLearningAction={(event) => reportLearning(event)}
               />
             </section>
           ) : null}
 
           {showDiagnostics ? (
             <aside
-              data-onboarding-target="compendium.diagnostics" className="diagnostics-drawer"
+              data-onboarding-target="compendium.diagnostics"
+              className="diagnostics-drawer"
               aria-label={t("Universe diagnostics", "Diagnóstico del universo")}
             >
               <header>
@@ -1793,8 +1987,6 @@ publication={site ? () => setShowPublication(true) : undefined}
             </aside>
           ) : null}
 
-
-
           <div className="compendium-reading-surface" hidden={showPublication}>
             <Reader
               site={site}
@@ -1844,7 +2036,15 @@ export default function App(props: { suiteChrome?: SuiteChrome } = {}) {
       data-window-chrome={!props.suiteChrome && isTauriRuntime()}
     >
       {!props.suiteChrome ? <WindowChromeSetup /> : null}
-      <ApplicationActivity.Provider value={props.suiteChrome?.active !== false}><NotificationProvider host={props.suiteChrome?.notifications} source="Compendium" active={props.suiteChrome?.active !== false}><CompendiumApp {...props} /></NotificationProvider></ApplicationActivity.Provider>
+      <ApplicationActivity.Provider value={props.suiteChrome?.active !== false}>
+        <NotificationProvider
+          host={props.suiteChrome?.notifications}
+          source="Compendium"
+          active={props.suiteChrome?.active !== false}
+        >
+          <CompendiumApp {...props} />
+        </NotificationProvider>
+      </ApplicationActivity.Provider>
     </div>
   );
 }

@@ -239,7 +239,10 @@ export function PublicationManager({
   const [operationNotice, setOperationNotice] = useState("");
   const notify = useNotify();
   useNotificationMessage(operationNotice, "success");
-  useNotificationMessage(operationError ? diagnosticText(operationError) : undefined, "error");
+  useNotificationMessage(
+    operationError ? diagnosticText(operationError) : undefined,
+    "error",
+  );
   const dialogRef = useDialogFocus({
     visible: !!pendingTransition,
     canClose: !saving,
@@ -357,13 +360,22 @@ export function PublicationManager({
     setOperationError("");
     setOperationNotice("");
     try {
-      const original = profiles.find(profile => profile.id === draft.id);
-      const selectionChanged = JSON.stringify(original?.selection) !== JSON.stringify(draft.selection);
+      const original = profiles.find((profile) => profile.id === draft.id);
+      const selectionChanged =
+        JSON.stringify(original?.selection) !== JSON.stringify(draft.selection);
       await onSave(draft);
       onLearningAction?.("profile-saved");
       if (selectionChanged) onLearningAction?.("selection-saved");
       if (activate) await onActivate(draft);
-      notify({ message: activate ? t("Publication saved and activated.", "Publicación guardada y activada.") : t("Publication saved.", "Publicación guardada."), kind: "success" });
+      notify({
+        message: activate
+          ? t(
+              "Publication saved and activated.",
+              "Publicación guardada y activada.",
+            )
+          : t("Publication saved.", "Publicación guardada."),
+        kind: "success",
+      });
       return true;
     } catch (error) {
       setOperationError(error instanceof Error ? error.message : String(error));
@@ -844,10 +856,21 @@ export function PublicationManager({
           </div>
         ) : null}
         <div className="publication-footer-actions">
-          <button data-onboarding-target="compendium.preview" type="button" onClick={() => { onPreview(draft); onLearningAction?.("publication-previewed"); }}>
+          <button
+            data-onboarding-target="compendium.preview"
+            type="button"
+            onClick={() => {
+              onPreview(draft);
+              onLearningAction?.("publication-previewed");
+            }}
+          >
             {t("Open Preview", "Abrir vista previa")}{" "}
           </button>
-          <button data-onboarding-target="compendium.export" type="button" onClick={() => void copyExportCommand()}>
+          <button
+            data-onboarding-target="compendium.export"
+            type="button"
+            onClick={() => void copyExportCommand()}
+          >
             {t("Copy ZIP command", "Copiar comando ZIP")}
           </button>
           <small>

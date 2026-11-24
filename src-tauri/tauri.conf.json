@@ -43,10 +43,7 @@
     "windows": {
       "nsis": {
         "installMode": "currentUser",
-        "languages": [
-          "English",
-          "Spanish"
-        ]
+        "languages": ["English", "Spanish"]
       }
     },
     "icon": [

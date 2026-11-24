@@ -146,11 +146,7 @@ export function createPresentationResolver(
     }
     const paths = propertyDefinitions(config);
     const resolveAssetPath = createVaultAssetPathResolver(assetPaths);
-    return (
-      entityType: string,
-      frontmatter: JsonRecord,
-      notePath: string,
-    ) => {
+    return (entityType: string, frontmatter: JsonRecord, notePath: string) => {
       const presentation = presentationByType.get(entityType);
       if (!presentation) return undefined;
       const result: { portrait?: string; cover?: string } = {};

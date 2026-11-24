@@ -86,7 +86,9 @@
   border-radius: 10px;
   box-shadow: none;
 }
-.forge-compendium :is(.reader-top-bar, .home-topbar) :is(button, input, summary) {
+.forge-compendium
+  :is(.reader-top-bar, .home-topbar)
+  :is(button, input, summary) {
   box-sizing: border-box;
   min-height: 30px;
   height: 30px;
@@ -187,10 +189,7 @@
   font-family: var(--ef-ui-font);
   font-size: 14px;
 }
-.forge-compendium
-  .suite-mode
-  .reader-top-left
-  > .reader-top-divider {
+.forge-compendium .suite-mode .reader-top-left > .reader-top-divider {
   display: none;
 }
 .forge-compendium .suite-mode .reader-top-left {

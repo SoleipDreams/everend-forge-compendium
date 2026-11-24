@@ -54,7 +54,12 @@ export function Reader({
       <Suspense
         fallback={
           <section className="page-title" role="status" aria-busy="true">
-            <h1>{t("Preparing the world graph…", "Preparando el grafo del mundo…")}</h1>
+            <h1>
+              {t(
+                "Preparing the world graph…",
+                "Preparando el grafo del mundo…",
+              )}
+            </h1>
           </section>
         }
       >

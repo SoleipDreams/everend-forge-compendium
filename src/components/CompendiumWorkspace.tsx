@@ -391,7 +391,12 @@ export function CompendiumWorkspace({
             />
           </div>
         </aside>
-        <div data-onboarding-target="compendium.reader" className="cp-workspace-main">{children}</div>
+        <div
+          data-onboarding-target="compendium.reader"
+          className="cp-workspace-main"
+        >
+          {children}
+        </div>
       </div>
     </IndexContext.Provider>
   );

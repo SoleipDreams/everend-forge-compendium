@@ -74,7 +74,8 @@ export function EventPage({
                 >
                   <strong>{choice.label}</strong>
                   <span>
-                    {t("Continue to", "Continuar hacia")} {choice.destinationName}
+                    {t("Continue to", "Continuar hacia")}{" "}
+                    {choice.destinationName}
                   </span>
                 </button>
               ))}

@@ -33,7 +33,8 @@ function parseUniverseProfile(
 
   try {
     const parsed = JSON.parse(profileFile.content) as UniverseProfile | null;
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return undefined;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      return undefined;
     const icon: UniverseIcon | undefined =
       parsed.icon?.type && parsed.icon.value
         ? {
@@ -68,11 +69,13 @@ export function assembleIndexedUniverse(
     ...file,
     relativePath: file.relativePath.replaceAll("\\", "/"),
   }));
-  const configFile = normalizedFiles.find(
-    (file) => file.relativePath === CONFIG_RELATIVE_PATH,
-  ) ?? normalizedFiles.find(
-    (file) => file.relativePath === ".everend/compendium.yaml",
-  );
+  const configFile =
+    normalizedFiles.find(
+      (file) => file.relativePath === CONFIG_RELATIVE_PATH,
+    ) ??
+    normalizedFiles.find(
+      (file) => file.relativePath === ".everend/compendium.yaml",
+    );
   const config = parseConfig(configFile?.content, configFile?.relativePath);
   const universeProfile = parseUniverseProfile(files);
   const availableStatuses = discoverEntityStatuses(files);
@@ -116,5 +119,10 @@ export function assembleSiteData(
     },
     dependencyPolicy: "include-marked" as const,
   };
-  return projectIndexedUniverse(indexed, options.mode ?? "preview", profile, sanitize);
+  return projectIndexedUniverse(
+    indexed,
+    options.mode ?? "preview",
+    profile,
+    sanitize,
+  );
 }

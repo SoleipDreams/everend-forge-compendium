@@ -287,9 +287,7 @@ function publicationAssets(
       .filter((value): value is string => Boolean(value))
       .forEach((value) => assets.add(value));
     findMarkdownAssets(entity.body)
-      .map((asset) =>
-        resolveAssetPath(entity.path, asset),
-      )
+      .map((asset) => resolveAssetPath(entity.path, asset))
       .filter((value): value is string => Boolean(value))
       .forEach((value) => assets.add(value));
   });
@@ -300,9 +298,7 @@ function publicationAssets(
           .filter((value): value is string => Boolean(value))
           .forEach((value) => assets.add(value));
         findMarkdownAssets(event.text ?? "")
-          .map((asset) =>
-            resolveAssetPath(undefined, asset),
-          )
+          .map((asset) => resolveAssetPath(undefined, asset))
           .filter((value): value is string => Boolean(value))
           .forEach((value) => assets.add(value));
       }),
@@ -559,7 +555,12 @@ export function projectIndexedUniverse(
     ),
   );
 
-  const assets = publicationAssets(indexed, entities, stories, resolveAssetPath);
+  const assets = publicationAssets(
+    indexed,
+    entities,
+    stories,
+    resolveAssetPath,
+  );
   const manifest: PublicationManifest | undefined =
     mode === "preview"
       ? {
