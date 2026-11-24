@@ -255,7 +255,7 @@ describe("Compendium reading explorer", () => {
     await key(input, "Enter");
     expect(navigate).toHaveBeenLastCalledWith(site.entities[1].route);
     await change(input, "missing");
-    expect(container.textContent).toContain("No matching entries.");
+    expect(container.textContent).toContain("No matching entities.");
     await key(input, "Escape");
     expect(input.value).toBe("");
     expect(container.querySelector('[role="listbox"]')).toBeNull();
@@ -400,7 +400,7 @@ describe("Publication draft transitions", () => {
 it("translates generated diagnostics without translating document paths, IDs or custom content", () => {
   const message = "Personajes/Aster.md is missing required entity frontmatter.";
   expect(formatCompendiumDiagnostic(message, "es")).toBe(
-    "Personajes/Aster.md no incluye los metadatos obligatorios de la ficha.",
+    "Personajes/Aster.md no incluye los metadatos obligatorios de la entidad.",
   );
   expect(formatCompendiumDiagnostic(message, "en")).toBe(message);
   expect(
