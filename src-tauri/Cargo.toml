@@ -1,6 +1,6 @@
 [package]
 name = "everend-compendium"
-version = "0.4.1"
+version = "0.5.1"
 description = "Desktop universe compendium reader for the Everend Forge suite"
 authors = ["Everendforge"]
 edition = "2021"

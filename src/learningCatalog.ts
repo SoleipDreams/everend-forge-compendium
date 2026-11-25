@@ -3,13 +3,13 @@ import {
   type LearningStep,
   type LearningLesson,
 } from "./learning";
+
 const step = (
   id: string,
   title: [string, string],
   body: [string, string],
   section: string,
   target: string,
-  event?: string,
   character: "brio" | "temple" = "temple",
 ): LearningStep => ({
   id,
@@ -17,16 +17,16 @@ const step = (
   body: t(...body),
   section,
   target,
-  event,
   character,
 });
+
 export const compendiumIntroduction = [
   step(
     "read",
     ["Tu mundo, para leer", "Your world, for reading"],
     [
-      "Compendium reúne las entidades y las historias disponibles del universo en una edición de lectura.",
-      "Compendium brings the universe's available entities and stories together in a reading edition.",
+      "Compendium reúne las entidades y las historias disponibles del universo en una edición de lectura. El Índice y el lector ayudan a explorarla.",
+      "Compendium brings the universe's available entities and stories together in a reading edition. The Index and reader help you explore it.",
     ],
     "reading",
     "compendium.reader",
@@ -35,7 +35,7 @@ export const compendiumIntroduction = [
     "organize",
     ["Elige qué compartir", "Choose what to share"],
     [
-      "Publicación organiza los perfiles y la selección de contenido. Una edición puede mostrar una parte de tu universo.",
+      "Publicación organiza los perfiles y la selección de contenido. Una edición puede mostrar solo una parte de tu universo.",
       "Publication organizes profiles and content selection. An edition can show just part of your universe.",
     ],
     "publication",
@@ -45,122 +45,117 @@ export const compendiumIntroduction = [
     "output",
     ["Revisa antes de compartir", "Review before sharing"],
     [
-      "Comprueba la vista previa y los diagnósticos. El botón Copiar comando ZIP prepara el comando de empaquetado; el archivo se genera al ejecutarlo.",
-      "Check the preview and diagnostics. Copy ZIP command prepares the packaging command; running it generates the file.",
+      "Vista previa y Diagnósticos ayudan a revisar la edición. Copiar comando ZIP prepara un comando para la CLI; no crea el archivo por sí solo.",
+      "Preview and Diagnostics help review an edition. Copy ZIP command prepares a CLI command; it does not create the file by itself.",
     ],
     "publication",
     "compendium.export",
   ),
 ];
+
 export const compendiumLessons: LearningLesson[] = [
   {
     id: "reading",
-    title: t("Explorar el contenido", "Explore the content"),
+    title: t("Explorar la edición", "Explore the edition"),
     summary: t(
-      "Encuentra una entidad o una historia.",
-      "Find an entity or a story.",
+      "Ubica el índice, las historias y el lector.",
+      "Locate the index, stories and reader.",
     ),
     section: "reading",
     steps: [
       step(
         "read",
-        ["Entra en tu mundo", "Enter your world"],
+        ["Índice y lector", "Index and reader"],
         [
-          "Abre una entidad desde Índice o una historia desde Historias. Si no hay entidades publicadas, continúa con una historia; puedes volver al índice cuando quieras.",
-          "Open an entity from Index or a story from Stories. If there are no published entities, continue with a story; you can return to the index at any time.",
+          "Índice reúne las entidades disponibles; Historias contiene los relatos publicados. Abrir una entrada la muestra en el lector. No necesitas seleccionar contenido para conocer esta vista.",
+          "Index contains the available entities; Stories contains published narratives. Opening an entry displays it in the reader. You do not need to select content for this tour.",
         ],
         "reading",
         "compendium.reader",
-        "content-opened",
         "brio",
       ),
     ],
   },
   {
     id: "profile",
-    title: t("Configurar un perfil", "Configure a profile"),
+    title: t("Perfiles de publicación", "Publication profiles"),
     summary: t(
-      "Guarda una edición para tu público.",
-      "Save an edition for your audience.",
+      "Conoce dónde se configuran las ediciones.",
+      "See where editions are configured.",
     ),
     section: "publication",
     steps: [
       step(
         "save",
-        ["Una edición con nombre", "An edition with a name"],
+        ["Un perfil para cada público", "A profile for each audience"],
         [
-          "En Publicación, crea o modifica un perfil y guárdalo. Puedes conservar los perfiles existentes.",
-          "In Publication, create or edit a profile and save it. You can keep existing profiles.",
+          "Publicación muestra perfiles con nombre y los ajustes de cada edición. Puedes crear perfiles distintos para públicos diferentes; no necesitas guardar cambios para continuar.",
+          "Publication shows named profiles and each edition's settings. You can create different profiles for different audiences; you do not need to save changes to continue.",
         ],
         "publication",
         "compendium.publication",
-        "profile-saved",
       ),
     ],
   },
   {
     id: "selection",
-    title: t("Seleccionar y revisar", "Select and review"),
+    title: t("Selección y revisión", "Selection and review"),
     summary: t(
-      "Comprueba qué verá el lector.",
-      "Check what the reader will see.",
+      "Ubica inclusión, vista previa y diagnósticos.",
+      "Locate inclusion, preview and diagnostics.",
     ),
     section: "publication",
     steps: [
       step(
         "selection",
-        ["Decide qué entra", "Choose what goes in"],
+        ["Qué incluye el perfil", "What a profile includes"],
         [
-          "Cambia la inclusión o exclusión de una entidad o historia en el perfil. Guarda antes de continuar.",
-          "Change an entity or story's inclusion or exclusion in the profile. Save before continuing.",
+          "Los controles de inclusión de Publicación indican qué entidades e historias aparecen en el perfil. Cambiar una selección es opcional en este recorrido.",
+          "Publication's inclusion controls show which entities and stories appear in a profile. Changing a selection is optional in this tour.",
         ],
         "publication",
         "compendium.publication",
-        "selection-saved",
       ),
       step(
         "preview",
-        ["Mira la edición", "See the edition"],
+        ["Vista previa", "Preview"],
         [
-          "Abre Vista previa para consultar el contenido seleccionado. Revisa los avisos antes de preparar la salida.",
-          "Open Preview to read the selected content. Review warnings before preparing output.",
+          "Vista previa muestra la edición tal como la leería su público. Desde aquí puedes recorrer el contenido que incluya el perfil activo.",
+          "Preview shows an edition as its audience would read it. From here, you can browse the content included in the active profile.",
         ],
         "publication",
         "compendium.preview",
-        "publication-previewed",
       ),
       step(
         "diagnostics",
-        ["Revisa los avisos", "Review the warnings"],
+        ["Avisos antes de publicar", "Warnings before publishing"],
         [
-          "Abre Diagnósticos. Comprueba referencias, archivos y contenido excluido; los avisos explican qué debes revisar.",
-          "Open Diagnostics. Check references, files and excluded content; warnings explain what needs review.",
+          "Diagnósticos reúne referencias, archivos y contenido excluido que conviene revisar. Abrir esta sección no cambia la edición.",
+          "Diagnostics collects references, files and excluded content that may need review. Opening this section does not change the edition.",
         ],
         "diagnostics",
         "compendium.diagnostics",
-        "diagnostics-opened",
       ),
     ],
   },
   {
     id: "output",
-    title: t("Preparar la salida ZIP", "Prepare ZIP output"),
+    title: t("Preparar una salida ZIP", "Prepare ZIP output"),
     summary: t(
-      "Obtén el comando para empaquetar tu edición.",
-      "Get the command to package your edition.",
+      "Ubica la salida y conoce cómo se genera el archivo.",
+      "Locate output and learn how the file is generated.",
     ),
     section: "publication",
     steps: [
       step(
         "command",
-        ["Prepara el paquete", "Prepare the package"],
+        ["Comando para empaquetar", "Packaging command"],
         [
-          "Usa Copiar comando ZIP. Se guardará el perfil y se copiará el comando. Ejecútalo en una terminal con la CLI de Compendium para generar el ZIP; esta guía confirma la preparación, no la creación del archivo.",
-          "Use Copy ZIP command. The profile is saved and the command copied. Run it in a terminal with the Compendium CLI to generate the ZIP; this guide confirms preparation, not file creation.",
+          "Copiar comando ZIP prepara la instrucción para la CLI de Compendium. El ZIP se genera al ejecutar ese comando en una terminal; esta guía solo señala dónde se prepara.",
+          "Copy ZIP command prepares an instruction for the Compendium CLI. The ZIP is generated by running that command in a terminal; this tour only shows where to prepare it.",
         ],
         "publication",
         "compendium.export",
-        "zip-command-copied",
       ),
     ],
   },
